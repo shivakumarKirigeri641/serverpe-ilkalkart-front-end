@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -24,7 +24,7 @@ function ClickHandler({ onPick }) {
 
 function Recenter({ pos }) {
   const map = useMap();
-  useEffect(() => { if (pos) map.flyTo(pos, 16, { duration: 0.8 }); }, [pos]);
+  useEffect(() => { if (pos) map.flyTo(pos, 16, { duration: 0.8 }); }, [pos, map]);
   return null;
 }
 

@@ -1,55 +1,41 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { apiGet } from '../utils/api.js';
-import {
-  mapProductToSaree,
-  facetsOf,
-  buildPriceBuckets,
-  heroMediaOf,
-} from '../data/sarees.js';
+import { createContext, useContext, useMemo } from 'react';
+import { useProducts, useQueryTypes, useOffers } from '../api/queries.js';
+import { facetsOf, buildPriceBuckets, heroMediaOf } from '../data/sarees.js';
 
 const CatalogContext = createContext(null);
 
 export function CatalogProvider({ children }) {
-  const [sarees, setSarees] = useState([]);
-  const [queryTypes, setQueryTypes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const [products, qt] = await Promise.all([
-          apiGet('/products'),
-          apiGet('/query-types'),
-        ]);
-        if (!alive) return;
-        const list = Array.isArray(products?.data) ? products.data : [];
-        setSarees(list.map(mapProductToSaree));
-        setQueryTypes(Array.isArray(qt?.data) ? qt.data : []);
-      } catch (e) {
-        if (alive) setError(e);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const products = useProducts();
+  const queryTypes = useQueryTypes();
+  const offers = useOffers();
 
   const value = useMemo(() => {
+    const sarees = products.data || [];
+    const qt = queryTypes.data || [];
+    const offerList = offers.data || [];
+    const bestOffer = offerList.reduce(
+      (best, o) => (o.percent > (best?.percent || 0) ? o : best),
+      null
+    );
     const facets = facetsOf(sarees);
     return {
       sarees,
-      queryTypes,
-      loading,
-      error,
+      queryTypes: qt,
+      offers: offerList,
+      bestOffer,
+      loading: products.isLoading || queryTypes.isLoading || offers.isLoading,
+      error: products.error || queryTypes.error || offers.error || null,
+      refetch: () => {
+        products.refetch();
+        queryTypes.refetch();
+        offers.refetch();
+      },
       ...facets,
       PRICE_BUCKETS: buildPriceBuckets(sarees),
       heroMedia: heroMediaOf(sarees),
     };
-  }, [sarees, queryTypes, loading, error]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products.data, products.isLoading, products.error, queryTypes.data, queryTypes.isLoading, queryTypes.error, offers.data, offers.isLoading, offers.error]);
 
   return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>;
 }

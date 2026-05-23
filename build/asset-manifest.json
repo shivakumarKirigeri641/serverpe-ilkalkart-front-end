@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d76859fc.css",
+    "main.js": "/static/js/main.d7c965e8.js",
+    "static/js/239.1e2b0f00.chunk.js": "/static/js/239.1e2b0f00.chunk.js",
+    "static/js/213.fb0ca72e.chunk.js": "/static/js/213.fb0ca72e.chunk.js",
+    "static/js/455.ab4d392d.chunk.js": "/static/js/455.ab4d392d.chunk.js",
+    "static/media/ilkalKart_logo.png": "/static/media/ilkalKart_logo.609ab1eb3a8fb8e3c726.png",
+    "index.html": "/index.html",
+    "main.d76859fc.css.map": "/static/css/main.d76859fc.css.map",
+    "main.d7c965e8.js.map": "/static/js/main.d7c965e8.js.map",
+    "239.1e2b0f00.chunk.js.map": "/static/js/239.1e2b0f00.chunk.js.map",
+    "213.fb0ca72e.chunk.js.map": "/static/js/213.fb0ca72e.chunk.js.map",
+    "455.ab4d392d.chunk.js.map": "/static/js/455.ab4d392d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d76859fc.css",
+    "static/js/main.d7c965e8.js"
+  ]
+}

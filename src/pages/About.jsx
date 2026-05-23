@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Briefcase, MapPin, ShieldCheck, HeartHandshake, Plane, Sparkles, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, Code2 } from 'lucide-react';
+import { MapPin, Plane, Sparkles, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, Code2 } from 'lucide-react';
 import logo from '../images/logo/ilkalKart_logo.png';
 
 export default function About() {

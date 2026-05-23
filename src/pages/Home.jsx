@@ -11,7 +11,7 @@ const SEED_TESTIMONIALS = [
 ];
 
 export default function Home() {
-  const { sarees, heroMedia } = useCatalog();
+  const { sarees, heroMedia, offers = [] } = useCatalog();
   const [slide, setSlide] = useState(0);
   const [testimonials, setTestimonials] = useState(SEED_TESTIMONIALS);
 
@@ -84,6 +84,35 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* OFFERS STRIP */}
+      {offers.length > 0 && (
+        <section className="bg-gradient-to-r from-ilkal-maroon via-ilkal-deep to-ilkal-maroon text-ilkal-cream">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap justify-center gap-3">
+            {offers.map((o, i) => (
+              <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-2xl border border-ilkal-gold/40 px-4 py-3 shadow w-full sm:w-[360px] lg:w-[380px]">
+                <div className="w-12 h-12 rounded-full bg-ilkal-gold text-ilkal-deep grid place-items-center font-bold text-lg shadow">
+                  <Gift className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-serif text-lg text-ilkal-gold truncate">{o.title}</span>
+                    <span className="text-[11px] font-bold bg-ilkal-gold text-ilkal-deep rounded-full px-2 py-0.5 shrink-0">
+                      {o.percent}% OFF
+                    </span>
+                  </div>
+                  {o.description && (
+                    <p className="text-xs opacity-90 line-clamp-2">{o.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center pb-3 text-[11px] tracking-wide text-ilkal-gold/80">
+            Applied automatically at checkout — no coupon code needed.
+          </div>
+        </section>
+      )}
 
       {/* TRUST STRIP */}
       <section className="bg-white border-y border-ilkal-gold/20">

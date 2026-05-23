@@ -46,7 +46,7 @@ export default function Confirmation() {
           <div className="mt-3 space-y-3">
             {order.items.map(it => (
               <div key={it.id} className="flex gap-3 items-center">
-                <img src={it.images[0]} className="w-14 h-16 rounded-xl object-cover" />
+                <img src={it.images[0]} alt={it.name} className="w-14 h-16 rounded-xl object-cover" />
                 <div className="flex-1">
                   <div className="font-semibold text-ilkal-maroon">{it.name}</div>
                   <div className="text-xs opacity-70">{it.color} • Qty {it.qty}</div>

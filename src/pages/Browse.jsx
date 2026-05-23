@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Plus, Minus, Star, ShoppingBag, Search, Camera, Heart, Eye,
-  SlidersHorizontal, ArrowDownUp, ChevronDown, ChevronUp, X, Trash2
+  SlidersHorizontal, ArrowDownUp, ChevronDown, ChevronUp, X, Trash2,
+  Flame, TrendingUp
 } from 'lucide-react';
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
@@ -318,7 +319,7 @@ export default function Browse() {
             <>
               <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {visibleList.map((s, i) => (
-                  <SareeCard key={s.id} s={s} index={i}
+                  <SareeCard key={`${s.id}-${i}`} s={s} index={i}
                     qty={qtyOf(s.id)} add={add} inc={inc} dec={dec}
                     onOpen={() => setActive(s)} />
                 ))}
@@ -453,16 +454,18 @@ function countBy(arr, fn) {
   arr.forEach(x => { const k = fn(x); m[k] = (m[k] || 0) + 1; });
   return m;
 }
-function countByMany(arr, fn) {
-  const m = {};
-  arr.forEach(x => fn(x).forEach(k => { m[k] = (m[k] || 0) + 1; }));
-  return m;
-}
 
 /* ---------- Product card (unchanged from previous version, kept inline) ---------- */
+const PLACEHOLDER_IMG =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400"><rect width="300" height="400" fill="%23FFF8F0"/><text x="50%" y="50%" font-family="Poppins,sans-serif" font-size="14" fill="%237B1E3A" text-anchor="middle" dominant-baseline="middle">No photo yet</text></svg>';
+
 function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
   const [hover, setHover] = useState(false);
   const [liked, setLiked] = useState(false);
+
+  const photoCount = s.gallery.length;
+  const primarySrc = s.gallery[0]?.src || PLACEHOLDER_IMG;
+  const altSrc = s.gallery[1]?.src || primarySrc;
 
   return (
     <motion.div
@@ -476,11 +479,11 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }}
         onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
         className="relative aspect-[3/4] overflow-hidden text-left bg-ilkal-cream cursor-pointer focus:outline-none focus:ring-2 focus:ring-ilkal-maroon">
-        <motion.img src={s.gallery[0].src} alt={s.name}
+        <motion.img src={primarySrc} alt={s.name}
           animate={{ scale: hover ? 1.12 : 1, opacity: hover ? 0 : 1 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="absolute inset-0 w-full h-full object-cover" />
-        <motion.img src={s.gallery[1].src} alt={`${s.name} alternate`}
+        <motion.img src={altSrc} alt={`${s.name} alternate`}
           initial={{ scale: 1.15, opacity: 0 }}
           animate={{ scale: hover ? 1.05 : 1.15, opacity: hover ? 1 : 0 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
@@ -500,11 +503,23 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
           <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-white' : ''}`} />
         </span>
         <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur text-white text-[10px] font-medium shadow">
-          <Camera className="w-3 h-3" /> {s.gallery.length} live
+          <Camera className="w-3 h-3" /> {photoCount} live
         </span>
         <span className="absolute top-10 left-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 border border-green-200 text-[9px] font-semibold shadow">
           Natural light • No edits
         </span>
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-1">
+          {s.popular && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ilkal-gold text-ilkal-deep text-[10px] font-bold shadow">
+              <Flame className="w-3 h-3" /> Popular
+            </span>
+          )}
+          {s.trending && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ilkal-rose text-white text-[10px] font-bold shadow">
+              <TrendingUp className="w-3 h-3" /> Trending
+            </span>
+          )}
+        </div>
       </div>
       <div className="p-3 flex flex-col flex-1">
         <h3 className="font-semibold text-ilkal-maroon text-sm line-clamp-1">{s.name}</h3>

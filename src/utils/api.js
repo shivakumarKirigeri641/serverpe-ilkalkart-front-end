@@ -1,16 +1,28 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(
-  /\/$/,
-  "",
+import axios from 'axios';
+
+export const API_BASE_URL = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+
+export const apiClient = axios.create({
+  baseURL: `${API_BASE_URL}/ik/customer`,
+  withCredentials: true,
+  timeout: 15000,
+});
+
+apiClient.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    const msg = err.response?.data?.message || err.message || 'Request failed';
+    return Promise.reject(new Error(msg));
+  },
 );
 
-const ikPath = (p) =>
-  `${API_BASE_URL}/ik/customer${p.startsWith("/") ? p : `/${p}`}`;
+export const apiGet = (path, config = {}) =>
+  apiClient.get(path, config).then((r) => r.data);
 
-export const apiGet = async (p, init = {}) => {
-  const res = await fetch(ikPath(p), { credentials: "include", ...init });
-  if (!res.ok) throw new Error(`HTTP ${res.status} on ${p}`);
-  return res.json();
+export const uploadsUrl = (urlPath) => {
+  const p = String(urlPath || '');
+  if (/^https?:\/\//i.test(p)) return p;
+  const trimmed = p.replace(/^\/+/, '');
+  const normalized = trimmed.startsWith('uploads/') ? trimmed : `uploads/${trimmed}`;
+  return `${API_BASE_URL}/${normalized}`;
 };
-
-export const uploadsUrl = (relPath) =>
-  `${API_BASE_URL}/uploads/${String(relPath || "").replace(/^\/+/, "")}`;

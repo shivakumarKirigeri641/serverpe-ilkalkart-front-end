@@ -116,7 +116,7 @@ export default function Dashboard() {
                       <div className="mt-3 flex gap-2 overflow-x-auto no-scrollbar">
                         {o.items.map(it => (
                           <div key={it.id} className="shrink-0 flex items-center gap-2 bg-ilkal-cream rounded-xl p-1.5 pr-3 border border-ilkal-gold/30">
-                            <img src={it.images[0]} className="w-10 h-12 rounded-lg object-cover" />
+                            <img src={it.images[0]} alt={it.name} className="w-10 h-12 rounded-lg object-cover" />
                             <div className="text-xs">
                               <div className="font-semibold text-ilkal-maroon">{it.name}</div>
                               <div className="opacity-70">Qty {it.qty}</div>

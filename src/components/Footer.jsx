@@ -20,22 +20,22 @@ export default function Footer() {
             Tradition delivered with trust, care and love.
           </p>
           <div className="flex flex-wrap gap-3 mt-4">
-            <a href="#" aria-label="WhatsApp" onClick={e => e.preventDefault()}
+            <button type="button" aria-label="WhatsApp"
               className="w-9 h-9 rounded-full bg-white/10 grid place-items-center hover:bg-ilkal-gold hover:text-ilkal-deep transition">
               <MessageCircle className="w-4 h-4" />
-            </a>
-            <a href="#" aria-label="Instagram" onClick={e => e.preventDefault()}
+            </button>
+            <button type="button" aria-label="Instagram"
               className="w-9 h-9 rounded-full bg-white/10 grid place-items-center hover:bg-ilkal-gold hover:text-ilkal-deep transition">
               <Instagram className="w-4 h-4" />
-            </a>
-            <a href="#" aria-label="Facebook" onClick={e => e.preventDefault()}
+            </button>
+            <button type="button" aria-label="Facebook"
               className="w-9 h-9 rounded-full bg-white/10 grid place-items-center hover:bg-ilkal-gold hover:text-ilkal-deep transition">
               <Facebook className="w-4 h-4" />
-            </a>
-            <a href="#" aria-label="YouTube" onClick={e => e.preventDefault()}
+            </button>
+            <button type="button" aria-label="YouTube"
               className="w-9 h-9 rounded-full bg-white/10 grid place-items-center hover:bg-ilkal-gold hover:text-ilkal-deep transition">
               <Youtube className="w-4 h-4" />
-            </a>
+            </button>
           </div>
         </div>
 
@@ -52,10 +52,10 @@ export default function Footer() {
         <div>
           <h4 className="text-ilkal-gold font-semibold mb-3">Policies</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="hover:text-ilkal-gold">Terms & Conditions</a></li>
-            <li><a href="#" className="hover:text-ilkal-gold">Authenticity Promise</a></li>
-            <li><a href="#" className="hover:text-ilkal-gold">Shipping Policy</a></li>
-            <li><a href="#" className="hover:text-ilkal-gold">Privacy Policy</a></li>
+            <li><button type="button" className="hover:text-ilkal-gold text-left">Terms & Conditions</button></li>
+            <li><button type="button" className="hover:text-ilkal-gold text-left">Authenticity Promise</button></li>
+            <li><button type="button" className="hover:text-ilkal-gold text-left">Shipping Policy</button></li>
+            <li><button type="button" className="hover:text-ilkal-gold text-left">Privacy Policy</button></li>
             <li><Link to="/track" className="hover:text-ilkal-gold">Track Order</Link></li>
           </ul>
         </div>

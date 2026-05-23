@@ -14,6 +14,7 @@ export default function Contact() {
     if (!form.type && queryTypes.length > 0) {
       setForm((p) => ({ ...p, type: queryTypes[0].title }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryTypes]);
 
   const submit = (e) => {

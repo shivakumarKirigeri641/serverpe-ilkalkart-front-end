@@ -11,7 +11,8 @@ export default function Checkout() {
   const nav = useNavigate();
   const {
     items, inc, dec, remove, subtotal, payable, baseAmount, gstAmount, gstRate, clear,
-    count, bulkEligible, bulkDiscount, bulkMinQty, bulkDiscountRate
+    count, bulkEligible, bulkDiscount, bulkMinQty, bulkDiscountRate,
+    offer, offerPercent, offerDiscount
   } = useCart();
 
   const clearBag = () => {
@@ -41,7 +42,7 @@ export default function Checkout() {
     setTimeout(() => {
       const order = {
         id: 'IK' + Date.now().toString().slice(-8),
-        items, contact, addr, subtotal, bulkDiscount, payable, baseAmount, gstAmount, shipping, total,
+        items, contact, addr, subtotal, bulkDiscount, offer, offerPercent, offerDiscount, payable, baseAmount, gstAmount, shipping, total,
         bulkOrder: bulkEligible,
         placedAt: new Date().toISOString()
       };
@@ -181,6 +182,13 @@ export default function Checkout() {
             <Row
               label={`Bulk discount (${(bulkDiscountRate * 100).toFixed(0)}% • ${count} sarees)`}
               value={`− ₹${bulkDiscount.toLocaleString('en-IN')}`}
+              highlight
+            />
+          )}
+          {offerPercent > 0 && (
+            <Row
+              label={`Offer: ${offer?.title || 'Special offer'} (${offerPercent}% off)`}
+              value={`− ₹${offerDiscount.toLocaleString('en-IN')}`}
               highlight
             />
           )}

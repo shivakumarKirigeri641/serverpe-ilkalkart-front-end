@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Plus, Minus, Heart, Share2, Star, ZoomIn } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
@@ -9,7 +9,10 @@ export default function SareeGallery({ saree, onClose }) {
   const { items, add, inc, dec } = useCart();
   const qty = items.find(i => i.id === saree.id)?.qty || 0;
 
-  const list = saree.gallery || saree.images.map(src => ({ src, angle: 'View', label: 'View', group: 'Saree' }));
+  const list = useMemo(() => {
+    if (saree.gallery && saree.gallery.length > 0) return saree.gallery;
+    return (saree.images || []).map((src) => ({ src, angle: 'View', label: 'View', group: 'Saree' }));
+  }, [saree.gallery, saree.images]);
   const [enlargedIdx, setEnlargedIdx] = useState(null);
   const [liked, setLiked] = useState(false);
 
@@ -33,12 +36,13 @@ export default function SareeGallery({ saree, onClose }) {
     window.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
     return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enlargedIdx]);
 
   const share = async () => {
     try {
-      if (navigator.share) await navigator.share({ title: saree.name, text: saree.desc, url: location.href });
-      else { await navigator.clipboard.writeText(location.href); toast.success('Link copied'); }
+      if (navigator.share) await navigator.share({ title: saree.name, text: saree.desc, url: window.location.href });
+      else { await navigator.clipboard.writeText(window.location.href); toast.success('Link copied'); }
     } catch {}
   };
 
@@ -142,8 +146,10 @@ export default function SareeGallery({ saree, onClose }) {
             <Spec label="Border"   value={saree.border   || '—'} />
             <Spec label="Pallu"    value={saree.pallu    || '—'} />
             <Spec label="Blouse"   value={saree.blouse   || '—'} />
-            <Spec label="Handloom" value={saree.handloom || '—'} />
-            <Spec label="Length"   value={saree.length   || '—'} />
+            <Spec label="Handloom" value={saree.isHandloom ? 'Yes' : 'No'} />
+            <Spec label="Length"   value={saree.lengthM ? `${saree.lengthM} m` : '—'} />
+            <Spec label="Width"    value={saree.width   ? `${saree.width} m`   : '—'} />
+            <Spec label="Thickness" value={saree.thickness ? `${saree.thickness} m` : '—'} />
           </div>
 
           <div className="mt-4 p-3 rounded-2xl bg-ilkal-cream border border-ilkal-gold/30 text-xs leading-relaxed">
