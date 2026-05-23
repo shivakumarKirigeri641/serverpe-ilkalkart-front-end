@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, ShieldCheck, Plane, HeartHandshake, Star, Quote, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Plane, HeartHandshake, Star, Quote, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, PackageCheck } from 'lucide-react';
 import { heroMedia, sarees } from '../data/sarees.js';
 
 const SEED_TESTIMONIALS = [
@@ -209,7 +209,8 @@ export default function Home() {
               { icon: BellRing,      t: 'Proactive live updates',         d: 'You will never have to chase a tracking link. I personally share each milestone — packed, dispatched, in-transit, delivered.' },
               { icon: Camera,        t: 'Real photos & videos — zero AI', d: 'Every photo and video is captured by me on my mobile phone in natural daylight. No AI generation, no editing, no filters, no DSLR depth-of-field, no colour grading — what you see on screen is exactly what arrives at your doorstep.' },
               { icon: QrCode,        t: 'Scannable authenticity code',    d: 'Every premium pack carries a unique QR code. Scan it at delivery to verify the saree is a genuine, hand-picked Ilkal piece.' },
-              { icon: Gift,          t: 'A heartfelt unboxing',           d: 'Thank-you card, wrap proof, saree-care guide and the live photo & video taken the moment your saree was packed — every detail is intentional.' }
+              { icon: Gift,          t: 'A heartfelt unboxing',           d: 'Thank-you card, wrap proof, saree-care guide and the live photo & video taken the moment your saree was packed — every detail is intentional.' },
+              { icon: PackageCheck,  t: 'Never draped, never worn',       d: 'I never photograph a saree draped on a lady or any doll. Your saree reaches you freshly folded and properly wrapped — it is unfolded only to record clear proof of its non-damaged condition, and is never worn by anyone before you.' }
             ].map((c, i) => (
               <motion.div key={i}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -238,7 +239,9 @@ export default function Home() {
               <p className="text-sm opacity-90 mt-1 leading-relaxed">
                 Because every saree leaves my hands with complete photo and video proof of its clean, pristine
                 condition, we don’t offer returns or replacements. You buy with full confidence — exactly what
-                you approve on screen is what arrives at your doorstep.
+                you approve on screen is what arrives at your doorstep. No saree is ever draped on a lady for
+                photos and none is ever worn before it reaches you — it is unfolded only to record the
+                non-damage proof, then folded and wrapped fresh.
               </p>
               <Link to="/about" className="inline-flex items-center gap-1 mt-3 text-ilkal-gold font-semibold text-sm hover:underline">
                 Read the full story <ArrowRight className="w-4 h-4" />
