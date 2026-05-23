@@ -6,9 +6,7 @@ import {
   Plus, Minus, Star, ShoppingBag, Search, Camera, Heart, Eye,
   SlidersHorizontal, ArrowDownUp, ChevronDown, ChevronUp, X, Trash2
 } from 'lucide-react';
-import {
-  sarees, MATERIALS, BORDERS, PALLUS, BLOUSES, HANDLOOMS, LENGTHS, COLORS, PRICE_BUCKETS
-} from '../data/sarees.js';
+import { useCatalog } from '../context/CatalogContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import SareeGallery from '../components/SareeGallery.jsx';
 
@@ -43,6 +41,10 @@ const initialFilters = () => ({
 const PAGE_SIZE = 16;
 
 export default function Browse() {
+  const {
+    sarees, loading,
+    MATERIALS, BORDERS, PALLUS, BLOUSES, HANDLOOMS, LENGTHS, COLORS, PRICE_BUCKETS,
+  } = useCatalog();
   const { items, add, inc, dec, clear, count } = useCart();
 
   const clearBag = () => {
@@ -86,7 +88,7 @@ export default function Browse() {
       default: break;
     }
     return list;
-  }, [f]);
+  }, [f, sarees, PRICE_BUCKETS]);
 
   // Reset to first page whenever the filtered result set changes.
   useEffect(() => { setVisible(PAGE_SIZE); }, [f]);
@@ -301,7 +303,12 @@ export default function Browse() {
 
         {/* Product grid */}
         <section>
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-ilkal-gold/20">
+              <div className="w-10 h-10 mx-auto rounded-full border-2 border-ilkal-gold/40 border-t-ilkal-maroon animate-spin" />
+              <p className="mt-3 opacity-80">Loading sarees…</p>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl border border-ilkal-gold/20">
               <div className="text-5xl">🌸</div>
               <p className="mt-3 opacity-80">No sarees match your filters.</p>

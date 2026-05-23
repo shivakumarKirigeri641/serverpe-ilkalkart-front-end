@@ -1,14 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Mail, Send, MessageCircle, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const QUERY_TYPES = ['General Enquiry', 'Order Help', 'Custom / Bespoke Weave', 'Bulk / Wedding Order', 'Wholesale', 'Feedback'];
+import { useCatalog } from '../context/CatalogContext.jsx';
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', mobile: '', type: QUERY_TYPES[0], message: '' });
+  const { queryTypes } = useCatalog();
+  const [form, setForm] = useState({ name: '', mobile: '', type: '', message: '' });
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    if (!form.type && queryTypes.length > 0) {
+      setForm((p) => ({ ...p, type: queryTypes[0].title }));
+    }
+  }, [queryTypes]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -18,7 +24,7 @@ export default function Contact() {
     }
     setSent(true);
     toast.success('We’ll reach out within 24 hours 💌');
-    setForm({ name: '', mobile: '', type: QUERY_TYPES[0], message: '' });
+    setForm({ name: '', mobile: '', type: queryTypes[0]?.title || '', message: '' });
     setTimeout(() => setSent(false), 4000);
   };
 
@@ -63,7 +69,7 @@ export default function Contact() {
           </Field>
           <Field label="Query Type">
             <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} className="input">
-              {QUERY_TYPES.map(t => <option key={t}>{t}</option>)}
+              {queryTypes.map(t => <option key={t.id} value={t.title}>{t.title}</option>)}
             </select>
           </Field>
           <Field label="Message *">

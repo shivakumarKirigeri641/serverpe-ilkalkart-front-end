@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, ShieldCheck, Plane, HeartHandshake, Star, Quote, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, PackageCheck } from 'lucide-react';
-import { heroMedia, sarees } from '../data/sarees.js';
+import { useCatalog } from '../context/CatalogContext.jsx';
 
 const SEED_TESTIMONIALS = [
   { id: 's1', n: 'Lakshmi, Bengaluru', t: 'I wore the Tope Teni for my pooja and got compliments all day. The fabric feels like a hug from my ajji.',           rating: 5 },
@@ -11,13 +11,15 @@ const SEED_TESTIMONIALS = [
 ];
 
 export default function Home() {
+  const { sarees, heroMedia } = useCatalog();
   const [slide, setSlide] = useState(0);
   const [testimonials, setTestimonials] = useState(SEED_TESTIMONIALS);
 
   useEffect(() => {
+    if (heroMedia.length === 0) return;
     const t = setInterval(() => setSlide(s => (s + 1) % heroMedia.length), 4500);
     return () => clearInterval(t);
-  }, []);
+  }, [heroMedia.length]);
 
   useEffect(() => {
     try {
@@ -65,7 +67,7 @@ export default function Home() {
                 </Link>
                 <Link to="/about" className="btn-gold">Our Story</Link>
               </div>
-              <p className="mt-4 font-script text-2xl text-ilkal-gold drop-shadow">{heroMedia[slide].caption}</p>
+              <p className="mt-4 font-script text-2xl text-ilkal-gold drop-shadow">{heroMedia[slide]?.caption}</p>
               <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/35 backdrop-blur border border-ilkal-gold/40 text-[11px] sm:text-xs">
                 <Camera className="w-3.5 h-3.5 text-ilkal-gold" />
                 <span className="tracking-wide">Every photo & video is <b className="text-ilkal-gold">live footage</b> in natural daylight — no AI, no edits.</span>
