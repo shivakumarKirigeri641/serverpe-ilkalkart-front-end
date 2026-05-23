@@ -10,6 +10,7 @@ import logo from '../images/logo/ilkalKart_logo.png';
 const links = [
   { to: '/', label: 'Home' },
   { to: '/browse', label: 'Browse Sarees' },
+  { to: '/bulk', label: 'Bulk Orders' },
   { to: '/track', label: 'Track my Saree' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },

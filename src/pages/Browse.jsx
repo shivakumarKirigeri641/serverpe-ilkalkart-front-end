@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import {
   Plus, Minus, Star, ShoppingBag, Search, Camera, Heart, Eye,
-  SlidersHorizontal, ArrowDownUp, ChevronDown, ChevronUp, X
+  SlidersHorizontal, ArrowDownUp, ChevronDown, ChevronUp, X, Trash2
 } from 'lucide-react';
 import {
   sarees, MATERIALS, BORDERS, PALLUS, BLOUSES, HANDLOOMS, LENGTHS, COLORS, PRICE_BUCKETS
@@ -42,7 +43,15 @@ const initialFilters = () => ({
 const PAGE_SIZE = 16;
 
 export default function Browse() {
-  const { items, add, inc, dec } = useCart();
+  const { items, add, inc, dec, clear, count } = useCart();
+
+  const clearBag = () => {
+    if (items.length === 0) return;
+    if (window.confirm(`Remove all ${count} saree${count === 1 ? '' : 's'} from your bag?`)) {
+      clear();
+      toast.success('Bag cleared');
+    }
+  };
   const [f, setF] = useState(initialFilters());
   const [active, setActive] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -210,7 +219,16 @@ export default function Browse() {
               <Camera className="w-3 h-3" /> Live footage • Natural daylight • Zero edits
             </span>
           </div>
-          <Link to="/checkout" className="btn-primary text-sm py-2 px-4"><ShoppingBag className="w-4 h-4" /> Bag</Link>
+          <div className="flex items-center gap-2">
+            {items.length > 0 && (
+              <button
+                onClick={clearBag}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-ilkal-maroon/30 text-ilkal-maroon text-sm font-semibold hover:bg-ilkal-maroon/5 transition">
+                <Trash2 className="w-4 h-4" /> Clear bag
+              </button>
+            )}
+            <Link to="/checkout" className="btn-primary text-sm py-2 px-4"><ShoppingBag className="w-4 h-4" /> Bag</Link>
+          </div>
         </div>
         <div className="flex gap-2">
           <div className="relative flex-1">

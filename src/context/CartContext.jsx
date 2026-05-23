@@ -38,12 +38,20 @@ export function CartProvider({ children }) {
   const count = items.reduce((s, i) => s + i.qty, 0);
   const subtotal = items.reduce((s, i) => s + i.qty * i.price, 0);
   const gstRate = 0.05; // 5% inclusive
-  const baseAmount = +(subtotal / (1 + gstRate)).toFixed(2);
-  const gstAmount = +(subtotal - baseAmount).toFixed(2);
+
+  // Bulk-order discount (driven by front-end for now; will move to back-end later).
+  const BULK_MIN_QTY = 8;
+  const BULK_DISCOUNT_RATE = 0.10;
+  const bulkEligible = count >= BULK_MIN_QTY;
+  const bulkDiscount = bulkEligible ? +(subtotal * BULK_DISCOUNT_RATE).toFixed(2) : 0;
+  const payable = +(subtotal - bulkDiscount).toFixed(2);
+  const baseAmount = +(payable / (1 + gstRate)).toFixed(2);
+  const gstAmount = +(payable - baseAmount).toFixed(2);
 
   const value = useMemo(() => ({
     items, add, inc, dec, remove, clear,
-    count, subtotal, baseAmount, gstAmount, gstRate, MAX_QTY
+    count, subtotal, payable, baseAmount, gstAmount, gstRate, MAX_QTY,
+    bulkEligible, bulkDiscount, bulkMinQty: BULK_MIN_QTY, bulkDiscountRate: BULK_DISCOUNT_RATE
   }), [items]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

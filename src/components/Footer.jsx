@@ -11,7 +11,9 @@ export default function Footer() {
             <div className="w-12 h-12 rounded-full bg-white grid place-items-center shadow ring-1 ring-ilkal-gold/40 overflow-hidden">
               <img src={logo} alt="Ilkal Kart" className="w-full h-full object-contain" />
             </div>
-            <h3 className="font-serif text-2xl text-ilkal-gold">Ilkal Kart</h3>
+            <h3 className="font-serif text-2xl text-ilkal-gold">
+              Ilkal Kart<sup className="text-xs align-super ml-0.5 opacity-90">™</sup>
+            </h3>
           </div>
           <p className="text-sm leading-relaxed opacity-90">
             Pure, Authentic, Genuine, Elegance — hand-picked in person from Ilkal village.
@@ -77,11 +79,18 @@ export default function Footer() {
           <div className="flex items-center gap-1">
             Made with <Heart className="w-3.5 h-3.5 text-ilkal-gold fill-ilkal-gold" /> from the daughters of Ilkal.
           </div>
-          <div>© {new Date().getFullYear()} Ilkal Kart. All rights reserved - Powered by: ServerPe App Solutions.</div>
+          <div>
+            © {new Date().getFullYear()} Ilkal Kart<sup className="align-super">™</sup>. All rights reserved — Powered by: ServerPe App Solutions.
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-2 text-center text-[10px] text-ilkal-cream/70 leading-relaxed">
+          “Ilkal Kart<sup className="align-super">™</sup>” is an <b>unregistered trademark</b> — application filed and
+          pending approval. Use of the <sup className="align-super">™</sup> symbol indicates a claim of common-law
+          rights; it does not denote registered status.
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-4 text-center text-[11px] tracking-wider text-ilkal-gold/90 leading-relaxed">
           Powered by: <b className="text-ilkal-gold">ServerPe App Solutions</b> — my own parent platform that
-          designs, hosts and maintains hand-picked projects like Ilkal Kart.
+          designs, hosts and maintains hand-picked projects like Ilkal Kart<sup className="align-super">™</sup>.
         </div>
       </div>
     </footer>

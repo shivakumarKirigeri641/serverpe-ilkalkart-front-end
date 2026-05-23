@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Minus, Trash2, Lock, ShieldCheck, ChevronRight, MapPin } from 'lucide-react';
+import { Plus, Minus, Trash2, Lock, ShieldCheck, ChevronRight, MapPin, Tag, Sparkles } from 'lucide-react';
 
 import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext.jsx';
@@ -9,14 +9,25 @@ import { ALL_REGIONS } from '../data/indianStates.js';
 
 export default function Checkout() {
   const nav = useNavigate();
-  const { items, inc, dec, remove, subtotal, baseAmount, gstAmount, gstRate, clear } = useCart();
+  const {
+    items, inc, dec, remove, subtotal, payable, baseAmount, gstAmount, gstRate, clear,
+    count, bulkEligible, bulkDiscount, bulkMinQty, bulkDiscountRate
+  } = useCart();
+
+  const clearBag = () => {
+    if (items.length === 0) return;
+    if (window.confirm(`Remove all ${count} saree${count === 1 ? '' : 's'} from your bag?`)) {
+      clear();
+      toast.success('Bag cleared');
+    }
+  };
 
   const [contact, setContact] = useState({ name: '', mobile: '', email: '' });
   const [addr, setAddr] = useState({ houseNo: '', line1: '', line2: '', city: '', district: '', state: '', pin: '', lat: null, lng: null, display: '' });
   const [paying, setPaying] = useState(false);
 
   const shipping = 0;
-  const total = subtotal + shipping;
+  const total = payable + shipping;
 
   const valid =
     contact.name.trim().length > 1 &&
@@ -30,7 +41,8 @@ export default function Checkout() {
     setTimeout(() => {
       const order = {
         id: 'IK' + Date.now().toString().slice(-8),
-        items, contact, addr, subtotal, baseAmount, gstAmount, shipping, total,
+        items, contact, addr, subtotal, bulkDiscount, payable, baseAmount, gstAmount, shipping, total,
+        bulkOrder: bulkEligible,
         placedAt: new Date().toISOString()
       };
       localStorage.setItem('ilkal_last_order', JSON.stringify(order));
@@ -65,8 +77,37 @@ export default function Checkout() {
           </span>
         </div>
 
+        {bulkEligible ? (
+          <div className="bg-ilkal-maroon/5 border border-ilkal-maroon/20 rounded-2xl px-4 py-3 text-sm text-ilkal-maroon flex items-start gap-2">
+            <Sparkles className="w-4 h-4 text-ilkal-gold mt-0.5 shrink-0" />
+            <span>
+              <b>Bulk-order discount unlocked!</b> {count} sarees in your bag — a flat{' '}
+              {(bulkDiscountRate * 100).toFixed(0)}% off (₹{bulkDiscount.toLocaleString('en-IN')}) has been applied below.
+            </span>
+          </div>
+        ) : (
+          <div className="bg-ilkal-cream border border-ilkal-gold/30 rounded-2xl px-4 py-3 text-sm text-ilkal-deep flex items-start gap-2">
+            <Tag className="w-4 h-4 text-ilkal-maroon mt-0.5 shrink-0" />
+            <span>
+              Order <b>{bulkMinQty}+ sarees</b> in one go and unlock a flat{' '}
+              <b>{(bulkDiscountRate * 100).toFixed(0)}% bulk discount</b> on your total —{' '}
+              <Link to="/bulk" className="text-ilkal-maroon font-semibold underline">see how it works</Link>.
+              (Currently {count} in bag.)
+            </span>
+          </div>
+        )}
+
         {/* Sarees */}
-        <Section title="Your Sarees">
+        <Section
+          title="Your Sarees"
+          action={
+            <button
+              onClick={clearBag}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-ilkal-maroon/30 text-ilkal-maroon text-xs font-semibold hover:bg-ilkal-maroon/5 transition">
+              <Trash2 className="w-3.5 h-3.5" /> Clear bag
+            </button>
+          }
+        >
           <div className="space-y-3">
             {items.map(it => (
               <div key={it.id} className="flex gap-3 bg-white rounded-2xl p-3 shadow-sm border border-ilkal-gold/20">
@@ -135,9 +176,16 @@ export default function Checkout() {
       {/* Summary */}
       <aside className="lg:sticky lg:top-20 h-fit">
         <Section title="Order Summary">
+          <Row label="Sub-total (incl. GST)" value={`₹${subtotal.toLocaleString('en-IN')}`} />
+          {bulkEligible && (
+            <Row
+              label={`Bulk discount (${(bulkDiscountRate * 100).toFixed(0)}% • ${count} sarees)`}
+              value={`− ₹${bulkDiscount.toLocaleString('en-IN')}`}
+              highlight
+            />
+          )}
           <Row label="Item value (excl. GST)" value={`₹${baseAmount.toLocaleString('en-IN')}`} />
           <Row label={`GST (${(gstRate * 100).toFixed(0)}%, inclusive)`} value={`₹${gstAmount.toLocaleString('en-IN')}`} />
-          <Row label="Sub-total (incl. GST)" value={`₹${subtotal.toLocaleString('en-IN')}`} />
           <Row label="Shipping" value={shipping ? `₹${shipping}` : 'FREE'} highlight={!shipping} />
           <div className="my-2 border-t border-dashed border-ilkal-gold/40" />
           <Row label="Total Payable" value={`₹${total.toLocaleString('en-IN')}`} bold />
@@ -163,10 +211,13 @@ export default function Checkout() {
   );
 }
 
-function Section({ title, children }) {
+function Section({ title, children, action }) {
   return (
     <section className="bg-white rounded-3xl p-5 shadow-md border border-ilkal-gold/20">
-      <h2 className="font-serif text-xl text-ilkal-maroon mb-3">{title}</h2>
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <h2 className="font-serif text-xl text-ilkal-maroon">{title}</h2>
+        {action}
+      </div>
       {children}
     </section>
   );

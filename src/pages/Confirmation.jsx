@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Package, MapPin, Phone, Mail, Sparkles, Download, FileText } from 'lucide-react';
+import { CheckCircle2, Package, MapPin, Phone, Mail, Sparkles, Download, FileText, Camera, MessageCircle } from 'lucide-react';
 import logo from '../images/logo/ilkalKart_logo.png';
 import { downloadInvoice } from '../utils/invoice.js';
 import toast from 'react-hot-toast';
@@ -73,12 +73,45 @@ export default function Confirmation() {
         </div>
 
         <div className="p-5 text-sm">
+          <Row label="Sub-total" value={`₹${order.subtotal.toLocaleString('en-IN')}`} />
+          {order.bulkDiscount > 0 && (
+            <Row label="Bulk discount (10%)" value={`− ₹${order.bulkDiscount.toLocaleString('en-IN')}`} />
+          )}
           <Row label="Item value (excl. GST)" value={`₹${order.baseAmount.toLocaleString('en-IN')}`} />
           <Row label="GST (5% inclusive)" value={`₹${order.gstAmount.toLocaleString('en-IN')}`} />
-          <Row label="Sub-total" value={`₹${order.subtotal.toLocaleString('en-IN')}`} />
           <Row label="Shipping" value={order.shipping ? `₹${order.shipping}` : 'FREE'} />
           <div className="border-t border-dashed border-ilkal-gold/40 my-2" />
           <Row label="Total Paid" value={`₹${order.total.toLocaleString('en-IN')}`} bold />
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-3xl border border-ilkal-gold/30 bg-ilkal-cream/70 p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <div className="w-11 h-11 rounded-2xl silk-gradient grid place-items-center shrink-0">
+            <Camera className="w-5 h-5 text-white" />
+          </div>
+          <div className="text-sm leading-relaxed">
+            <h3 className="font-serif text-lg text-ilkal-maroon">Live photo & video proof coming shortly</h3>
+            <p className="mt-1 opacity-90">
+              I personally record <b>live photos and a video</b> of your saree — full drape, close-ups and the
+              final packing — once your order is confirmed. This proof shows the saree is fresh, undamaged, never
+              draped on anyone and never worn before it reaches you.
+            </p>
+            <ul className="mt-3 space-y-1.5">
+              <li className="flex items-start gap-2">
+                <MessageCircle className="w-4 h-4 text-green-700 mt-0.5 shrink-0" />
+                <span>
+                  The link will be sent to your WhatsApp on <b>+91 {order.contact.mobile}</b> as soon as it's recorded.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Package className="w-4 h-4 text-ilkal-maroon mt-0.5 shrink-0" />
+                <span>
+                  You can also access it any time from the <Link to="/track" className="text-ilkal-maroon font-semibold underline">Track my Saree</Link> page using Order ID <b>{order.id}</b>.
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 

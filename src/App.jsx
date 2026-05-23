@@ -13,6 +13,7 @@ import Confirmation from './pages/Confirmation.jsx';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Feedback from './pages/Feedback.jsx';
+import Bulk from './pages/Bulk.jsx';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Browse />} />
+          <Route path="/bulk" element={<Bulk />} />
           <Route path="/track" element={<Track />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
