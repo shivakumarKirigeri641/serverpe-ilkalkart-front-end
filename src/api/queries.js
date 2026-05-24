@@ -17,6 +17,24 @@ export const useQueryTypes = () =>
     select: (res) => (Array.isArray(res?.data) ? res.data : []),
   });
 
+export const useStatesUnions = () =>
+  useQuery({
+    queryKey: ["states-unions"],
+    queryFn: () => apiGet("/states-unions"),
+    select: (res) => {
+      const rows = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+      return rows
+        .map((r) => ({
+          id: r.id,
+          code: r.state_union_code,
+          name: r.state_union_name,
+          isUnionTerritory: Boolean(r.is_union_territory),
+        }))
+        .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    },
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+
 export const useGstValue = () =>
   useQuery({
     queryKey: ["gst-value"],

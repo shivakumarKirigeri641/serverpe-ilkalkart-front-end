@@ -28,7 +28,7 @@ function Recenter({ pos }) {
   return null;
 }
 
-export default function AddressPicker({ value, onChange }) {
+export default function AddressPicker({ value, onChange, stateOptions = [] }) {
   const [pos, setPos] = useState(value?.lat && value?.lng ? [value.lat, value.lng] : null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
@@ -44,18 +44,19 @@ export default function AddressPicker({ value, onChange }) {
       const data = await res.json();
       const a = data.address || {};
       const line1 = [a.house_number, a.road || a.pedestrian || a.neighbourhood].filter(Boolean).join(' ');
-      const line2 = [a.suburb, a.village, a.hamlet].filter(Boolean).join(', ');
+      const area = [a.suburb, a.village, a.hamlet].filter(Boolean).join(', ');
       const city  = a.city || a.town || a.village || a.county || '';
-      const state = a.state || '';
+      const stateName = a.state || '';
       const pin   = a.postcode || '';
       const district = a.state_district || a.county || '';
+      const matchedState = stateOptions.find(o => o.name?.toLowerCase() === stateName.toLowerCase());
       onChange({
         ...(value || {}),
         line1: line1 || (data.display_name?.split(',')[0] ?? ''),
-        line2,
+        area,
         city,
         district,
-        state,
+        state: matchedState ? matchedState.id : '',
         pin: (pin || '').replace(/\D/g, '').slice(0, 6),
         lat, lng,
         display: data.display_name
