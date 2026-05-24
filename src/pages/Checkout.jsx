@@ -7,6 +7,9 @@ import { useCart } from '../context/CartContext.jsx';
 import AddressPicker from '../components/AddressPicker.jsx';
 import { ALL_REGIONS } from '../data/indianStates.js';
 
+const PLACEHOLDER_IMG =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 96"><rect width="80" height="96" fill="%23FFF8F0"/><text x="50%" y="50%" font-family="Poppins,sans-serif" font-size="10" fill="%237B1E3A" text-anchor="middle" dominant-baseline="middle">Saree</text></svg>';
+
 export default function Checkout() {
   const nav = useNavigate();
   const {
@@ -112,12 +115,24 @@ export default function Checkout() {
           <div className="space-y-3">
             {items.map(it => (
               <div key={it.id} className="flex gap-3 bg-white rounded-2xl p-3 shadow-sm border border-ilkal-gold/20">
-                <img src={it.images[0]} alt={it.name} className="w-20 h-24 rounded-xl object-cover" />
+                <img
+                  src={it.images?.[0] || it.gallery?.[0]?.src || PLACEHOLDER_IMG}
+                  alt={it.name}
+                  className="w-20 h-24 rounded-xl object-cover" />
                 <div className="flex-1">
                   <div className="flex justify-between">
-                    <div>
-                      <h3 className="font-semibold text-ilkal-maroon">{it.name}</h3>
-                      <p className="text-xs opacity-70">{it.color}</p>
+                    <div className="min-w-0 pr-2">
+                      <h3 className="font-semibold text-ilkal-maroon truncate">{it.name}</h3>
+                      <dl className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] leading-tight">
+                        {it.color && (<><dt className="opacity-60">Color</dt><dd className="text-ilkal-deep font-medium truncate">{it.color}</dd></>)}
+                        {it.material && (<><dt className="opacity-60">Material</dt><dd className="text-ilkal-deep font-medium truncate">{it.material}</dd></>)}
+                        {it.border && (<><dt className="opacity-60">Border</dt><dd className="text-ilkal-deep font-medium truncate">{it.border}</dd></>)}
+                        {it.pallu && (<><dt className="opacity-60">Pallu</dt><dd className="text-ilkal-deep font-medium truncate">{it.pallu}</dd></>)}
+                        {it.blouse && (<><dt className="opacity-60">Blouse</dt><dd className="text-ilkal-deep font-medium truncate">{it.blouse}</dd></>)}
+                      </dl>
+                      {it.isHandloom && (
+                        <span className="mt-1 inline-block chip text-[10px]">Handloom</span>
+                      )}
                     </div>
                     <button onClick={() => remove(it.id)} className="text-ilkal-maroon/70 hover:text-ilkal-maroon">
                       <Trash2 className="w-4 h-4" />

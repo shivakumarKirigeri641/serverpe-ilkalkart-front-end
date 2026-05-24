@@ -1,40 +1,126 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useOffers } from '../api/queries.js';
+import { apiClient } from '../utils/api.js';
 
 const CartContext = createContext(null);
 const MAX_QTY = 5;
+const SAREE_CACHE_KEY = 'ilkal_saree_cache';
+
+const loadCache = () => {
+  try { return JSON.parse(localStorage.getItem(SAREE_CACHE_KEY)) || {}; } catch { return {}; }
+};
+const saveCache = (c) => {
+  try { localStorage.setItem(SAREE_CACHE_KEY, JSON.stringify(c)); } catch {}
+};
+
+function mapApiItem(api, cache) {
+  const code = api.combined_code;
+  const c = cache[code] || {};
+  const price = Number(api.base_price) || 0;
+  const mrp = Number(api.comparable_price) || 0;
+  return {
+    id: api.id,
+    code,
+    combined_code: code,
+    inventoryId: api.inventory_id,
+    name: api.title,
+    color: api.color,
+    material: api.material,
+    border: api.border,
+    pallu: api.pallu,
+    blouse: api.blouse,
+    handloom: api.handloom ? 'Handloom' : '',
+    isHandloom: Boolean(api.handloom),
+    rating: Number(api.ratings) || 0,
+    lengthM: Number(api.dimension_length) || '',
+    width: Number(api.dimension_width) || 0,
+    thickness: Number(api.dimension_thickness) || 0,
+    qty: Number(api.quantity) || 0,
+    price,
+    mrp,
+    discount: mrp > price ? Math.round((1 - price / mrp) * 100) : 0,
+    totalPrice: Number(api.total_price) || price * (Number(api.quantity) || 0),
+    stockMessage: api.custom_message,
+    imgDirectory: api.img_directory,
+    videoDirectory: api.video_directory,
+    images: c.images || [],
+    gallery: c.gallery || [],
+  };
+}
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('ilkal_cart')) || []; } catch { return []; }
-  });
+  const [items, setItems] = useState([]);
+  const [grandTotal, setGrandTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('ilkal_cart', JSON.stringify(items));
-  }, [items]);
+  const ingest = useCallback((data) => {
+    const cache = loadCache();
+    const list = Array.isArray(data?.items) ? data.items.map((it) => mapApiItem(it, cache)) : [];
+    setItems(list);
+    setGrandTotal(Number(data?.grand_total_price) || 0);
+  }, []);
 
-  const add = (saree) => {
-    setItems(prev => {
-      const found = prev.find(i => i.id === saree.id);
-      if (found) {
-        if (found.qty >= MAX_QTY) { toast.error('Max 5 per saree'); return prev; }
-        toast.success('Added to bag');
-        return prev.map(i => i.id === saree.id ? { ...i, qty: i.qty + 1 } : i);
-      }
-      toast.success('Added to bag');
-      return [...prev, { ...saree, qty: 1 }];
-    });
-  };
+  const refresh = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await apiClient.get('/cart-items');
+      ingest(res.data?.data);
+    } catch {
+      // silent — cart will show empty
+    } finally {
+      setLoading(false);
+    }
+  }, [ingest]);
 
-  const inc = (id) => setItems(prev => prev.map(i => i.id === id ? { ...i, qty: Math.min(MAX_QTY, i.qty + 1) } : i));
-  const dec = (id) => setItems(prev => prev.flatMap(i => {
-    if (i.id !== id) return [i];
-    if (i.qty <= 1) return [];
-    return [{ ...i, qty: i.qty - 1 }];
-  }));
-  const remove = (id) => setItems(prev => prev.filter(i => i.id !== id));
-  const clear = () => setItems([]);
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const callCart = useCallback(async (method, path, body) => {
+    try {
+      const res = await apiClient.request({ method, url: path, data: body });
+      const ok = res.data?.successstatus;
+      if (ok) ingest(res.data.data);
+      else toast.error(res.data?.message || 'Cart update failed');
+      return ok;
+    } catch (e) {
+      toast.error(e.message || 'Cart update failed');
+      return false;
+    }
+  }, [ingest]);
+
+  const add = useCallback(async (saree) => {
+    if (!saree?.code) { toast.error('Missing product code'); return; }
+    const existing = items.find((i) => i.code === saree.code);
+    if (existing && existing.qty >= MAX_QTY) { toast.error(`Max ${MAX_QTY} per saree`); return; }
+    const cache = loadCache();
+    cache[saree.code] = { images: saree.images || [], gallery: saree.gallery || [] };
+    saveCache(cache);
+    const ok = await callCart('post', '/add-to-cart', { combined_code: saree.code });
+    if (ok) toast.success('Added to bag');
+  }, [items, callCart]);
+
+  const inc = useCallback(async (id) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    if (item.qty >= MAX_QTY) { toast.error(`Max ${MAX_QTY} per saree`); return; }
+    await callCart('post', '/add-to-cart', { combined_code: item.code });
+  }, [items, callCart]);
+
+  const dec = useCallback(async (id) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    await callCart('put', '/reduce-item-from-cart', { combined_code: item.code });
+  }, [items, callCart]);
+
+  const remove = useCallback(async (id) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    await callCart('delete', '/remove-item-from-cart', { combined_code: item.code });
+  }, [items, callCart]);
+
+  const clear = useCallback(async () => {
+    await callCart('delete', '/clear-cart');
+  }, [callCart]);
 
   const offersQuery = useOffers();
   const activeOffer = (offersQuery.data || []).reduce(
@@ -43,7 +129,8 @@ export function CartProvider({ children }) {
   );
 
   const count = items.reduce((s, i) => s + i.qty, 0);
-  const subtotal = items.reduce((s, i) => s + i.qty * i.price, 0);
+  const subtotalFromItems = items.reduce((s, i) => s + i.qty * i.price, 0);
+  const subtotal = grandTotal || subtotalFromItems;
   const gstRate = 0.05; // 5% inclusive
 
   // Bulk-order discount (driven by front-end for now; will move to back-end later).
@@ -60,11 +147,12 @@ export function CartProvider({ children }) {
   const gstAmount = +(payable - baseAmount).toFixed(2);
 
   const value = useMemo(() => ({
-    items, add, inc, dec, remove, clear,
-    count, subtotal, payable, baseAmount, gstAmount, gstRate, MAX_QTY,
+    items, loading, refresh,
+    add, inc, dec, remove, clear,
+    count, subtotal, grandTotal, payable, baseAmount, gstAmount, gstRate, MAX_QTY,
     bulkEligible, bulkDiscount, bulkMinQty: BULK_MIN_QTY, bulkDiscountRate: BULK_DISCOUNT_RATE,
     offer: activeOffer, offerPercent, offerDiscount,
-  }), [items, count, subtotal, payable, baseAmount, gstAmount, bulkEligible, bulkDiscount, activeOffer, offerPercent, offerDiscount]);
+  }), [items, loading, refresh, add, inc, dec, remove, clear, count, subtotal, grandTotal, payable, baseAmount, gstAmount, bulkEligible, bulkDiscount, activeOffer, offerPercent, offerDiscount]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
