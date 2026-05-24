@@ -193,6 +193,10 @@ export default function Checkout() {
         toast.error(body?.message || 'Invalid OTP');
         return;
       }
+      const persistedAddrId = body?.data?.user_address?.id;
+      if (persistedAddrId) {
+        setAddr(a => ({ ...a, id: persistedAddrId }));
+      }
       setOtpVerified(true);
       toast.success('Mobile verified');
     } catch (e) {
@@ -245,8 +249,8 @@ export default function Checkout() {
         currency: 'INR',
         user_name: contact.name.trim(),
         mobile_number: contact.mobile,
+        address_id: addr.id || null,
         email: contact.email || null,
-        addressData: addr,
       });
       const createBody = createRes.data;
       if (!createBody?.successstatus) {
@@ -281,7 +285,7 @@ export default function Checkout() {
                 razorpay_order_id: rzpResponse.razorpay_order_id,
                 razorpay_payment_id: rzpResponse.razorpay_payment_id,
                 razorpay_signature: rzpResponse.razorpay_signature,
-                user_id,
+                mobile_number: contact.mobile,
                 amount: total,
                 price_per_set: baseAmount,
                 gst_percentage: gstPercent,
