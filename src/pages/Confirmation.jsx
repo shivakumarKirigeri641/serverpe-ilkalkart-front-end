@@ -78,7 +78,9 @@ export default function Confirmation() {
             <Row label="Bulk discount (10%)" value={`− ₹${order.bulkDiscount.toLocaleString('en-IN')}`} />
           )}
           <Row label="Item value (excl. GST)" value={`₹${order.baseAmount.toLocaleString('en-IN')}`} />
-          <Row label="GST (5% inclusive)" value={`₹${order.gstAmount.toLocaleString('en-IN')}`} />
+          <Row
+            label={`${order.gstDescription || 'GST'} (${order.gstPercent ?? Math.round((order.gstRate || 0) * 100)}% inclusive)`}
+            value={`₹${order.gstAmount.toLocaleString('en-IN')}`} />
           <Row label="Shipping" value={order.shipping ? `₹${order.shipping}` : 'FREE'} />
           <div className="border-t border-dashed border-ilkal-gold/40 my-2" />
           <Row label="Total Paid" value={`₹${order.total.toLocaleString('en-IN')}`} bold />

@@ -83,11 +83,6 @@ export default function Footer() {
             © {new Date().getFullYear()} Ilkal Kart<sup className="align-super">™</sup>. All rights reserved — Powered by: ServerPe App Solutions.
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-2 text-center text-[10px] text-ilkal-cream/70 leading-relaxed">
-          “Ilkal Kart<sup className="align-super">™</sup>” is an <b>unregistered trademark</b> — application filed and
-          pending approval. Use of the <sup className="align-super">™</sup> symbol indicates a claim of common-law
-          rights; it does not denote registered status.
-        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-4 text-center text-[11px] tracking-wider text-ilkal-gold/90 leading-relaxed">
           Powered by: <b className="text-ilkal-gold">ServerPe App Solutions</b> — my own parent platform that
           designs, hosts and maintains hand-picked projects like Ilkal Kart<sup className="align-super">™</sup>.

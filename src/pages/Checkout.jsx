@@ -13,7 +13,7 @@ const PLACEHOLDER_IMG =
 export default function Checkout() {
   const nav = useNavigate();
   const {
-    items, inc, dec, remove, subtotal, payable, baseAmount, gstAmount, gstRate, clear,
+    items, inc, dec, remove, subtotal, payable, baseAmount, gstAmount, gstRate, gstPercent, gstDescription, clear,
     count, bulkEligible, bulkDiscount, bulkMinQty, bulkDiscountRate,
     offer, offerPercent, offerDiscount
   } = useCart();
@@ -45,7 +45,7 @@ export default function Checkout() {
     setTimeout(() => {
       const order = {
         id: 'IK' + Date.now().toString().slice(-8),
-        items, contact, addr, subtotal, bulkDiscount, offer, offerPercent, offerDiscount, payable, baseAmount, gstAmount, shipping, total,
+        items, contact, addr, subtotal, bulkDiscount, offer, offerPercent, offerDiscount, payable, baseAmount, gstAmount, gstRate, gstPercent, gstDescription, shipping, total,
         bulkOrder: bulkEligible,
         placedAt: new Date().toISOString()
       };
@@ -208,7 +208,23 @@ export default function Checkout() {
             />
           )}
           <Row label="Item value (excl. GST)" value={`₹${baseAmount.toLocaleString('en-IN')}`} />
-          <Row label={`GST (${(gstRate * 100).toFixed(0)}%, inclusive)`} value={`₹${gstAmount.toLocaleString('en-IN')}`} />
+          {(() => {
+            const isKarnataka = /karnataka/i.test(addr.state || '');
+            const halfPct = gstPercent / 2;
+            const fmtPct = (p) => (Number.isInteger(p) ? `${p}` : p.toFixed(1));
+            const halfAmt = +(gstAmount / 2).toFixed(2);
+            return isKarnataka ? (
+              <>
+                <Row label={`CGST (${fmtPct(halfPct)}%)`} value={`₹${halfAmt.toLocaleString('en-IN')}`} />
+                <Row label={`SGST (${fmtPct(halfPct)}%)`} value={`₹${halfAmt.toLocaleString('en-IN')}`} />
+              </>
+            ) : (
+              <Row label={`GST (${fmtPct(gstPercent)}%)`} value={`₹${gstAmount.toLocaleString('en-IN')}`} />
+            );
+          })()}
+          {gstDescription && (
+            <p className="text-[10px] opacity-60 leading-snug -mt-0.5 mb-1">{gstDescription}</p>
+          )}
           <Row label="Shipping" value={shipping ? `₹${shipping}` : 'FREE'} highlight={!shipping} />
           <div className="my-2 border-t border-dashed border-ilkal-gold/40" />
           <Row label="Total Payable" value={`₹${total.toLocaleString('en-IN')}`} bold />

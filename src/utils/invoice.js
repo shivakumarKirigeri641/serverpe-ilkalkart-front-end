@@ -84,9 +84,12 @@ export function downloadInvoice(order) {
 
   // ---------- Items table ----------
   const tableTop = Math.max(y, y2) + 16;
+  const gstRate = Number(order.gstRate) || 0;
+  const gstPercent = order.gstPercent ?? Math.round(gstRate * 100);
+  const halfPercent = (gstPercent / 2).toFixed(gstPercent % 2 === 0 ? 0 : 1);
   const rows = order.items.map((it, i) => {
     const lineTotal = it.qty * it.price;
-    const baseAmt = +(lineTotal / 1.05).toFixed(2);
+    const baseAmt = gstRate > 0 ? +(lineTotal / (1 + gstRate)).toFixed(2) : lineTotal;
     const gst = +(lineTotal - baseAmt).toFixed(2);
     return [
       String(i + 1),
@@ -101,7 +104,7 @@ export function downloadInvoice(order) {
 
   autoTable(doc, {
     startY: tableTop,
-    head: [['#', 'Saree', 'Qty', 'Unit Price\n(incl. GST)', 'Taxable\nValue', 'GST 5%', 'Total']],
+    head: [['#', 'Saree', 'Qty', 'Unit Price\n(incl. GST)', 'Taxable\nValue', `GST ${gstPercent}%`, 'Total']],
     body: rows,
     theme: 'grid',
     headStyles: { fillColor: MAROON, textColor: 255, fontStyle: 'bold', fontSize: 9, halign: 'center' },
@@ -137,8 +140,8 @@ export function downloadInvoice(order) {
   doc.setLineWidth(0.6);
   doc.roundedRect(boxX, ty - 12, boxW, 105, 6, 6);
   row('Taxable value', fmtINR(order.baseAmount));
-  row('CGST (2.5%)', fmtINR(order.gstAmount / 2));
-  row('SGST (2.5%)', fmtINR(order.gstAmount / 2));
+  row(`CGST (${halfPercent}%)`, fmtINR(order.gstAmount / 2));
+  row(`SGST (${halfPercent}%)`, fmtINR(order.gstAmount / 2));
   row('Sub-total', fmtINR(order.subtotal));
   row('Shipping', order.shipping ? fmtINR(order.shipping) : 'FREE');
   // separator

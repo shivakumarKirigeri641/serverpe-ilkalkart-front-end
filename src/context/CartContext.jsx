@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useOffers } from '../api/queries.js';
+import { useGstValue, useOffers } from '../api/queries.js';
 import { apiClient } from '../utils/api.js';
 
 const CartContext = createContext(null);
@@ -128,10 +128,14 @@ export function CartProvider({ children }) {
     null
   );
 
+  const gstQuery = useGstValue();
+  const gstRate = gstQuery.data?.rate ?? 0;
+  const gstPercent = gstQuery.data?.percent ?? 0;
+  const gstDescription = gstQuery.data?.description || '';
+
   const count = items.reduce((s, i) => s + i.qty, 0);
   const subtotalFromItems = items.reduce((s, i) => s + i.qty * i.price, 0);
   const subtotal = grandTotal || subtotalFromItems;
-  const gstRate = 0.05; // 5% inclusive
 
   // Bulk-order discount (driven by front-end for now; will move to back-end later).
   const BULK_MIN_QTY = 8;
@@ -143,16 +147,16 @@ export function CartProvider({ children }) {
   const afterBulk = +(subtotal - bulkDiscount).toFixed(2);
   const offerDiscount = offerPercent > 0 ? +(afterBulk * (offerPercent / 100)).toFixed(2) : 0;
   const payable = +(afterBulk - offerDiscount).toFixed(2);
-  const baseAmount = +(payable / (1 + gstRate)).toFixed(2);
+  const baseAmount = gstRate > 0 ? +(payable / (1 + gstRate)).toFixed(2) : payable;
   const gstAmount = +(payable - baseAmount).toFixed(2);
 
   const value = useMemo(() => ({
     items, loading, refresh,
     add, inc, dec, remove, clear,
-    count, subtotal, grandTotal, payable, baseAmount, gstAmount, gstRate, MAX_QTY,
+    count, subtotal, grandTotal, payable, baseAmount, gstAmount, gstRate, gstPercent, gstDescription, MAX_QTY,
     bulkEligible, bulkDiscount, bulkMinQty: BULK_MIN_QTY, bulkDiscountRate: BULK_DISCOUNT_RATE,
     offer: activeOffer, offerPercent, offerDiscount,
-  }), [items, loading, refresh, add, inc, dec, remove, clear, count, subtotal, grandTotal, payable, baseAmount, gstAmount, bulkEligible, bulkDiscount, activeOffer, offerPercent, offerDiscount]);
+  }), [items, loading, refresh, add, inc, dec, remove, clear, count, subtotal, grandTotal, payable, baseAmount, gstAmount, gstRate, gstPercent, gstDescription, bulkEligible, bulkDiscount, activeOffer, offerPercent, offerDiscount]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

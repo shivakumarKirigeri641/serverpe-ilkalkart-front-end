@@ -17,6 +17,18 @@ export const useQueryTypes = () =>
     select: (res) => (Array.isArray(res?.data) ? res.data : []),
   });
 
+export const useGstValue = () =>
+  useQuery({
+    queryKey: ["gst-value"],
+    queryFn: () => apiGet("/gst-value"),
+    select: (res) => {
+      const row = Array.isArray(res?.data) ? res.data[0] : null;
+      const percent = Number(row?.gst_percent) || 0;
+      return { percent, rate: percent / 100, description: row?.description || "" };
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+
 export const useOffers = () =>
   useQuery({
     queryKey: ["offers"],
