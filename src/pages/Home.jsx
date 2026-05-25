@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, ShieldCheck, Plane, HeartHandshake, Star, Quote, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, PackageCheck } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Plane, HeartHandshake, Star, Quote, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, PackageCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCatalog } from '../context/CatalogContext.jsx';
+import { apiClient, uploadsUrl } from '../utils/api.js';
 
 const SEED_TESTIMONIALS = [
   { id: 's1', n: 'Lakshmi, Bengaluru', t: 'I wore the Tope Teni for my pooja and got compliments all day. The fabric feels like a hug from my ajji.',           rating: 5 },
@@ -10,10 +11,21 @@ const SEED_TESTIMONIALS = [
   { id: 's3', n: 'Anitha, Hyderabad',  t: 'The Kasuti embroidery is unbelievable. Worth every rupee. Felt like a queen at my sister’s wedding.',                     rating: 5 }
 ];
 
+const TESTIMONIALS_PER_PAGE = 4;
+
 export default function Home() {
   const { sarees, heroMedia, offers = [] } = useCatalog();
   const [slide, setSlide] = useState(0);
   const [testimonials, setTestimonials] = useState(SEED_TESTIMONIALS);
+  const [testimonialPage, setTestimonialPage] = useState(0);
+
+  const testimonialPageCount = Math.max(
+    1,
+    Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE),
+  );
+  useEffect(() => {
+    if (testimonialPage >= testimonialPageCount) setTestimonialPage(0);
+  }, [testimonialPageCount, testimonialPage]);
 
   useEffect(() => {
     if (heroMedia.length === 0) return;
@@ -22,14 +34,25 @@ export default function Home() {
   }, [heroMedia.length]);
 
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('ilkal_feedbacks')) || [];
-      const mapped = saved.map(f => ({
-        id: f.id, n: f.name, t: f.message, rating: f.rating, image: f.image
-      }));
-      const merged = [...mapped, ...SEED_TESTIMONIALS].slice(0, 6);
-      setTestimonials(merged);
-    } catch {}
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiClient.get('/feedbacks');
+        const body = res.data;
+        if (cancelled) return;
+        if (body?.successstatus && Array.isArray(body.data) && body.data.length > 0) {
+          const mapped = body.data.slice(0, 20).map(f => ({
+            id: f.id,
+            n: f.user_name,
+            t: f.message,
+            rating: Number(f.rating) || 5,
+            image: f.pic_path ? uploadsUrl(f.pic_path) : null,
+          }));
+          setTestimonials(mapped);
+        }
+      } catch { /* keep seed */ }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   return (
@@ -347,24 +370,71 @@ export default function Home() {
               Share yours <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {testimonials.map((r, i) => (
-              <motion.div key={r.id || i}
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-3xl p-6 shadow-lg border border-ilkal-gold/20">
-                <div className="flex gap-1 text-ilkal-gold">
-                  {Array.from({ length: 5 }).map((_, k) => (
-                    <Star key={k} className={`w-4 h-4 ${k < (r.rating || 5) ? 'fill-ilkal-gold' : 'text-ilkal-gold/30'}`} />
-                  ))}
-                </div>
-                {r.image && (
-                  <img src={r.image} alt={r.n} className="mt-3 rounded-2xl object-cover w-full max-h-48 border border-ilkal-gold/20" />
-                )}
-                <p className="mt-3 text-sm leading-relaxed opacity-90">“{r.t}”</p>
-                <p className="mt-3 font-semibold text-ilkal-maroon text-sm">{r.n}</p>
+          <div className="mt-8 relative">
+            <div className="overflow-hidden">
+              <motion.div
+                animate={{ x: `-${testimonialPage * 100}%` }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="flex"
+              >
+                {Array.from({ length: testimonialPageCount }).map((_, p) => {
+                  const slice = testimonials.slice(
+                    p * TESTIMONIALS_PER_PAGE,
+                    (p + 1) * TESTIMONIALS_PER_PAGE,
+                  );
+                  return (
+                    <div key={p} className="shrink-0 w-full grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                      {slice.map((r, i) => (
+                        <div key={r.id || i}
+                          className="bg-white rounded-3xl p-5 shadow-lg border border-ilkal-gold/20">
+                          <div className="flex gap-1 text-ilkal-gold">
+                            {Array.from({ length: 5 }).map((_, k) => (
+                              <Star key={k} className={`w-4 h-4 ${k < (r.rating || 5) ? 'fill-ilkal-gold' : 'text-ilkal-gold/30'}`} />
+                            ))}
+                          </div>
+                          {r.image && (
+                            <img
+                              src={r.image}
+                              alt={r.n}
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                              className="mt-3 rounded-2xl object-cover w-full max-h-48 border border-ilkal-gold/20"
+                            />
+                          )}
+                          <p className="mt-3 text-sm leading-relaxed opacity-90">“{r.t}”</p>
+                          <p className="mt-3 font-semibold text-ilkal-maroon text-sm">{r.n}</p>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
               </motion.div>
-            ))}
+            </div>
+
+            {testimonialPageCount > 1 && (
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  aria-label="Previous testimonials"
+                  onClick={() => setTestimonialPage((p) => Math.max(0, p - 1))}
+                  disabled={testimonialPage === 0}
+                  className="w-9 h-9 rounded-full bg-white border border-ilkal-gold/40 shadow grid place-items-center text-ilkal-maroon disabled:opacity-40">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <Dots
+                  count={testimonialPageCount}
+                  current={testimonialPage}
+                  onSelect={setTestimonialPage}
+                />
+                <button
+                  type="button"
+                  aria-label="Next testimonials"
+                  onClick={() => setTestimonialPage((p) => Math.min(testimonialPageCount - 1, p + 1))}
+                  disabled={testimonialPage === testimonialPageCount - 1}
+                  className="w-9 h-9 rounded-full bg-white border border-ilkal-gold/40 shadow grid place-items-center text-ilkal-maroon disabled:opacity-40">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -398,4 +468,41 @@ export default function Home() {
       </section>
     </div>
   );
+}
+
+function Dots({ count, current, onSelect }) {
+  const items = buildDotItems(count, current);
+  return (
+    <div className="flex items-center gap-1.5">
+      {items.map((item, idx) =>
+        item === '…' ? (
+          <span key={`gap-${idx}`} className="px-1 text-ilkal-maroon/60 select-none">…</span>
+        ) : (
+          <button
+            key={item}
+            type="button"
+            aria-label={`Go to page ${item + 1}`}
+            onClick={() => onSelect(item)}
+            className={`transition-all rounded-full ${
+              item === current
+                ? 'w-6 h-2 bg-ilkal-maroon'
+                : 'w-2 h-2 bg-ilkal-gold/50 hover:bg-ilkal-gold'
+            }`}
+          />
+        ),
+      )}
+    </div>
+  );
+}
+
+function buildDotItems(count, current) {
+  if (count <= 5) return Array.from({ length: count }, (_, i) => i);
+  const items = new Set([0, count - 1, current, current - 1, current + 1]);
+  const sorted = [...items].filter((n) => n >= 0 && n < count).sort((a, b) => a - b);
+  const out = [];
+  for (let i = 0; i < sorted.length; i++) {
+    out.push(sorted[i]);
+    if (i < sorted.length - 1 && sorted[i + 1] - sorted[i] > 1) out.push('…');
+  }
+  return out;
 }

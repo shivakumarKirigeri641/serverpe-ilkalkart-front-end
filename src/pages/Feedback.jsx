@@ -1,74 +1,105 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Send, Image as ImageIcon, X, MessageSquareHeart, ArrowRight } from 'lucide-react';
+import { Star, Send, Image as ImageIcon, X, MessageSquareHeart, ArrowRight, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { apiClient, uploadsUrl } from '../utils/api.js';
 
-const STORAGE_KEY = 'ilkal_feedbacks';
-const MAX_IMAGE_BYTES = 2 * 1024 * 1024; // 2 MB
-
-function loadFeedbacks() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveFeedbacks(list) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-}
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 
 export default function Feedback() {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
-  const [image, setImage] = useState('');
+  const [picFile, setPicFile] = useState(null);
+  const [picPreview, setPicPreview] = useState('');
   const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef(null);
 
-  useEffect(() => { setList(loadFeedbacks()); }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await apiClient.get('/feedbacks');
+      const body = res.data;
+      if (body?.successstatus && Array.isArray(body.data)) {
+        setList(body.data);
+      } else {
+        setList([]);
+      }
+    } catch {
+      setList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchList(); }, []);
 
   const pickImage = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Please pick an image file'); return; }
     if (file.size > MAX_IMAGE_BYTES) { toast.error('Image too large — keep under 2 MB'); return; }
+    setPicFile(file);
     const reader = new FileReader();
-    reader.onload = () => setImage(reader.result);
+    reader.onload = () => setPicPreview(reader.result);
     reader.readAsDataURL(file);
   };
 
-  const submit = (e) => {
+  const clearImage = () => {
+    setPicFile(null);
+    setPicPreview('');
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const submit = async (e) => {
     e.preventDefault();
     if (!name.trim() || !message.trim() || rating < 1) {
       toast.error('Please share your name, rating and a message');
       return;
     }
-    const entry = {
-      id: 'fb-' + Date.now(),
-      name: name.trim(),
-      message: message.trim(),
-      rating,
-      image: image || null,
-      createdAt: new Date().toISOString()
-    };
-    const next = [entry, ...list].slice(0, 50);
-    setList(next);
-    saveFeedbacks(next);
-    toast.success('Thank you for your kind words 💛');
-    setRating(0); setHover(0); setName(''); setMessage(''); setImage('');
-    if (fileRef.current) fileRef.current.value = '';
+    setSubmitting(true);
+    try {
+      let res;
+      if (picFile) {
+        const fd = new FormData();
+        fd.append('user_name', name.trim());
+        fd.append('rating', String(rating));
+        fd.append('message', message.trim());
+        fd.append('pic', picFile);
+        res = await apiClient.post('/feedback', fd);
+      } else {
+        res = await apiClient.post('/feedback', {
+          user_name: name.trim(),
+          rating,
+          message: message.trim(),
+        });
+      }
+      const body = res.data;
+      if (!body?.successstatus) {
+        toast.error(body?.message || 'Could not save feedback');
+        return;
+      }
+      toast.success('Thank you for your kind words 💛');
+      setRating(0); setHover(0); setName(''); setMessage('');
+      clearImage();
+      fetchList();
+    } catch (err) {
+      toast.error(err?.message || 'Could not save feedback');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const avg = list.length > 0
-    ? (list.reduce((s, f) => s + f.rating, 0) / list.length).toFixed(1)
+    ? (list.reduce((s, f) => s + Number(f.rating || 0), 0) / list.length).toFixed(1)
     : '5.0';
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-      {/* Header */}
       <div className="text-center">
         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ilkal-maroon/10 text-ilkal-maroon text-xs font-semibold tracking-widest">
           <MessageSquareHeart className="w-3.5 h-3.5" /> YOUR VOICE MATTERS
@@ -83,7 +114,6 @@ export default function Feedback() {
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-        {/* Form */}
         <motion.form onSubmit={submit}
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-3xl p-5 sm:p-6 shadow-lg border border-ilkal-gold/20">
@@ -124,13 +154,13 @@ export default function Feedback() {
             <div className="flex items-center gap-3">
               <label className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ilkal-cream border border-ilkal-gold/40 text-ilkal-maroon text-sm font-semibold cursor-pointer hover:bg-ilkal-maroon/10 transition">
                 <ImageIcon className="w-4 h-4" />
-                {image ? 'Replace photo' : 'Choose photo'}
+                {picPreview ? 'Replace photo' : 'Choose photo'}
                 <input ref={fileRef} type="file" accept="image/*" onChange={pickImage} className="hidden" />
               </label>
-              {image && (
+              {picPreview && (
                 <div className="relative">
-                  <img src={image} alt="preview" className="w-16 h-16 rounded-xl object-cover border border-ilkal-gold/30 shadow" />
-                  <button type="button" onClick={() => { setImage(''); if (fileRef.current) fileRef.current.value = ''; }}
+                  <img src={picPreview} alt="preview" className="w-16 h-16 rounded-xl object-cover border border-ilkal-gold/30 shadow" />
+                  <button type="button" onClick={clearImage}
                     className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white shadow grid place-items-center">
                     <X className="w-3.5 h-3.5 text-ilkal-maroon" />
                   </button>
@@ -143,15 +173,15 @@ export default function Feedback() {
             </p>
           </Field>
 
-          <button className="btn-primary w-full mt-5">
-            <Send className="w-4 h-4" /> Send Feedback
+          <button className="btn-primary w-full mt-5 disabled:opacity-60" disabled={submitting}>
+            {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {submitting ? 'Sending…' : 'Send Feedback'}
           </button>
           <p className="mt-2 text-[11px] text-center opacity-60">
             Your feedback may appear on the landing page testimonials.
           </p>
         </motion.form>
 
-        {/* Sidebar — average + CTA */}
         <div className="space-y-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -185,10 +215,14 @@ export default function Feedback() {
         </div>
       </div>
 
-      {/* Recent feedbacks */}
       <div className="mt-12">
         <h2 className="font-serif text-2xl text-ilkal-maroon">Recent voices</h2>
-        {list.length === 0 ? (
+        {loading ? (
+          <div className="mt-4 text-center py-10 bg-white rounded-3xl border border-ilkal-gold/20">
+            <Loader2 className="w-5 h-5 animate-spin inline text-ilkal-maroon" />
+            <p className="opacity-70 mt-2 text-sm">Fetching latest feedback…</p>
+          </div>
+        ) : list.length === 0 ? (
           <div className="mt-4 text-center py-10 bg-white rounded-3xl border border-ilkal-gold/20">
             <p className="opacity-70">No feedback yet — be the very first to write one.</p>
           </div>
@@ -202,16 +236,24 @@ export default function Feedback() {
                   className="bg-white rounded-3xl p-5 shadow-md border border-ilkal-gold/20">
                   <div className="flex items-center gap-1 text-ilkal-gold">
                     {Array.from({ length: 5 }).map((_, k) => (
-                      <Star key={k} className={`w-4 h-4 ${k < f.rating ? 'fill-ilkal-gold' : 'text-ilkal-gold/30'}`} />
+                      <Star key={k} className={`w-4 h-4 ${k < Number(f.rating || 0) ? 'fill-ilkal-gold' : 'text-ilkal-gold/30'}`} />
                     ))}
                   </div>
-                  {f.image && (
-                    <img src={f.image} alt={f.name}
-                      className="mt-3 rounded-2xl object-cover w-full max-h-56 border border-ilkal-gold/20" />
+                  {f.pic_path && (
+                    <img
+                      src={uploadsUrl(f.pic_path)}
+                      alt={f.user_name}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      className="mt-3 rounded-2xl object-cover w-full max-h-56 border border-ilkal-gold/20"
+                    />
                   )}
                   <p className="mt-3 text-sm leading-relaxed opacity-90">“{f.message}”</p>
-                  <p className="mt-3 font-semibold text-ilkal-maroon text-sm">— {f.name}</p>
-                  <p className="text-[11px] opacity-50">{new Date(f.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                  <p className="mt-3 font-semibold text-ilkal-maroon text-sm">— {f.user_name}</p>
+                  {f.created_at && (
+                    <p className="text-[11px] opacity-50">
+                      {new Date(f.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  )}
                 </motion.div>
               ))}
             </AnimatePresence>

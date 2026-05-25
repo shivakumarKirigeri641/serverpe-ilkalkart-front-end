@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Mail, Send, MessageCircle, ArrowRight } from 'lucide-react';
+import { Mail, Send, MessageCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCatalog } from '../context/CatalogContext.jsx';
+import { apiClient } from '../utils/api.js';
 
 export default function Contact() {
   const { queryTypes } = useCatalog();
-  const [form, setForm] = useState({ name: '', mobile: '', type: '', message: '' });
+  const [form, setForm] = useState({ name: '', mobile: '', type: '', email: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
@@ -17,16 +19,39 @@ export default function Contact() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryTypes]);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (!form.name || !/^[6-9]\d{9}$/.test(form.mobile) || !form.message) {
+    if (!form.name.trim() || !/^[6-9]\d{9}$/.test(form.mobile) || !form.message.trim()) {
       toast.error('Please fill name, valid mobile and message');
       return;
     }
-    setSent(true);
-    toast.success('We’ll reach out within 24 hours 💌');
-    setForm({ name: '', mobile: '', type: queryTypes[0]?.title || '', message: '' });
-    setTimeout(() => setSent(false), 4000);
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      toast.error('Please enter a valid email or leave it blank');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await apiClient.post('/contact-me', {
+        user_name: form.name.trim(),
+        mobile_number: form.mobile,
+        query_type_name: form.type || (queryTypes[0]?.title || 'General Query'),
+        message: form.message.trim(),
+        email: form.email.trim() || null,
+      });
+      const body = res.data;
+      if (!body?.successstatus) {
+        toast.error(body?.message || 'Could not send your message');
+        return;
+      }
+      setSent(true);
+      toast.success("We'll reach out within 24 hours 💌");
+      setForm({ name: '', mobile: '', type: queryTypes[0]?.title || '', email: '', message: '' });
+      setTimeout(() => setSent(false), 4000);
+    } catch (err) {
+      toast.error(err?.message || 'Could not send your message');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
