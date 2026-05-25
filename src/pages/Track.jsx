@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PackageCheck, PackageSearch, Truck, MapPin, Sparkles, Camera, Video, MessageCircle, ExternalLink, Clock } from 'lucide-react';
 
 export default function Track() {
   const [oid, setOid] = useState('');
   const [result, setResult] = useState(null);
+  const [searchParams] = useSearchParams();
 
-  const track = (e) => {
-    e.preventDefault();
-    if (!oid.trim()) return;
+  const runTrack = (orderId) => {
+    const id = String(orderId || '').trim();
+    if (!id) return;
     const stages = [
       { icon: PackageCheck, t: 'Order Confirmed', s: 'Your saree booking is received', done: true, time: 'Today, 09:12 AM' },
       { icon: Sparkles, t: 'Hand-picked from Ilkal', s: 'Personally selected at the loom', done: true, time: 'Today, 04:30 PM' },
@@ -24,8 +26,21 @@ export default function Track() {
       recordedAt: 'Tomorrow, 10:30 AM',
       whatsappSentTo: '+91 ••••• ••302'
     };
-    setResult({ id: oid.toUpperCase(), stages, proof });
+    setResult({ id: id.toUpperCase(), stages, proof });
   };
+
+  const track = (e) => {
+    e.preventDefault();
+    runTrack(oid);
+  };
+
+  useEffect(() => {
+    const fromUrl = searchParams.get('oid');
+    if (fromUrl && fromUrl.trim()) {
+      setOid(fromUrl);
+      runTrack(fromUrl);
+    }
+  }, [searchParams]);
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">

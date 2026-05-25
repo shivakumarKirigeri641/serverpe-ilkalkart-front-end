@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Package, MapPin, Phone, Mail, Sparkles, Download, FileText, Camera, MessageCircle } from 'lucide-react';
+import { CheckCircle2, Package, MapPin, Phone, Mail, Sparkles, Download, FileText, Camera, MessageCircle, Copy, Truck } from 'lucide-react';
 import logo from '../images/logo/ilkalKart_logo.png';
 import { downloadInvoice } from '../utils/invoice.js';
 import { uploadsUrl } from '../utils/api.js';
@@ -12,9 +12,20 @@ const fmtINR = (n) =>
 
 export default function Confirmation() {
   const [data, setData] = useState(null);
+  const navigate = useNavigate();
   useEffect(() => {
     try { setData(JSON.parse(localStorage.getItem('ilkal_last_order'))); } catch {}
   }, []);
+
+  const copyOrderId = async (value) => {
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(String(value));
+      toast.success('Order ID copied');
+    } catch {
+      toast.error('Could not copy');
+    }
+  };
 
   if (!data || !data.payment_details) {
     return (
@@ -92,9 +103,17 @@ export default function Confirmation() {
         </div>
         <h1 className="font-serif text-3xl text-ilkal-maroon mt-4">Thank you, {firstName}!</h1>
         <p className="opacity-80 mt-1">Your Ilkal saree is in safe hands. We'll wrap it with love.</p>
-        <p className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ilkal-cream border border-ilkal-gold/40 text-ilkal-maroon font-semibold">
-          <Sparkles className="w-4 h-4 text-ilkal-gold" /> Order ID: {orderRef}
-        </p>
+        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-ilkal-cream border border-ilkal-gold/40 text-ilkal-maroon font-semibold">
+          <Sparkles className="w-4 h-4 text-ilkal-gold" />
+          <span>Order ID: {orderRef}</span>
+          <button
+            type="button"
+            onClick={() => copyOrderId(orderRef)}
+            title="Copy Order ID"
+            className="ml-1 inline-flex items-center justify-center w-7 h-7 rounded-full bg-white border border-ilkal-gold/40 hover:bg-ilkal-gold/10 transition">
+            <Copy className="w-3.5 h-3.5 text-ilkal-maroon" />
+          </button>
+        </div>
         {invoice.invoice_id && (
           <p className="mt-2 text-xs opacity-70">Invoice: {invoice.invoice_id}</p>
         )}
@@ -186,9 +205,9 @@ export default function Confirmation() {
             <Camera className="w-5 h-5 text-white" />
           </div>
           <div className="text-sm leading-relaxed">
-            <h3 className="font-serif text-lg text-ilkal-maroon">Live photo & video proof coming shortly</h3>
+            <h3 className="font-serif text-lg text-ilkal-maroon">Photo &amp; video recordings</h3>
             <p className="mt-1 opacity-90">
-              {platform.founder_name || 'Our curator'} personally records <b>live photos and a video</b> of your saree —
+              {platform.founder_name || 'Our curator'} personally records <b>photos and a video</b> of your saree —
               full drape, close-ups and the final packing — once your order is confirmed.
             </p>
             <ul className="mt-3 space-y-1.5">
@@ -199,9 +218,16 @@ export default function Confirmation() {
                 </span>
               </li>
               <li className="flex items-start gap-2">
+                <Truck className="w-4 h-4 text-ilkal-maroon mt-0.5 shrink-0" />
+                <span>
+                  <b>Shipping details</b> (courier &amp; tracking number) will be shared on the same WhatsApp number{' '}
+                  <b>+91 {user.mobile_number}</b> once your saree is prepared and ready to ship.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
                 <Package className="w-4 h-4 text-ilkal-maroon mt-0.5 shrink-0" />
                 <span>
-                  You can also access it any time from the <Link to="/track" className="text-ilkal-maroon font-semibold underline">Track my Saree</Link> page using Order ID <b>{orderRef}</b>.
+                  You can also check the status any time from the <Link to={`/track?oid=${encodeURIComponent(orderRef || '')}`} className="text-ilkal-maroon font-semibold underline">Track my Saree</Link> page using Order ID <b>{orderRef}</b>.
                 </span>
               </li>
             </ul>
@@ -213,7 +239,12 @@ export default function Confirmation() {
         <button onClick={handleDownload} className="btn-primary">
           <Download className="w-4 h-4" /> Download Invoice (PDF)
         </button>
-        <Link to="/track" className="btn-gold">Track my Saree</Link>
+        <button
+          type="button"
+          onClick={() => navigate(`/track?oid=${encodeURIComponent(orderRef || '')}`)}
+          className="btn-gold">
+          <Truck className="w-4 h-4" /> Track
+        </button>
         <Link to="/browse" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-ilkal-maroon bg-white border border-ilkal-gold/40 shadow hover:shadow-lg transition">
           Start Browsing Sarees
         </Link>
