@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, Lock, ShieldCheck, ChevronRight, MapPin, Tag, Sparkles, MessageSquare, CheckCircle2, AlertTriangle } from 'lucide-react';
 
@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext.jsx';
 import AddressPicker from '../components/AddressPicker.jsx';
 import { useStatesUnions } from '../api/queries.js';
-import { apiClient } from '../utils/api.js';
+import { apiClient, API_BASE_URL } from '../utils/api.js';
 
 const RAZORPAY_SCRIPT_SRC = 'https://checkout.razorpay.com/v1/checkout.js';
 const loadRazorpay = () => new Promise((resolve, reject) => {
@@ -225,15 +225,48 @@ export default function Checkout() {
   const valid = !Object.values(fieldErrors).some(Boolean) && items.length > 0;
   const showErr = (k) => showErrors && fieldErrors[k];
 
-  const persistOrder = (order) => {
-    localStorage.setItem('ilkal_last_order', JSON.stringify(order));
+  const inFlightRef = useRef(null);
+  const reportFailure = async (reason, extra = {}) => {
+    const ref = inFlightRef.current;
+    if (!ref) return;
     try {
-      const prev = JSON.parse(localStorage.getItem('ilkal_orders')) || [];
-      localStorage.setItem('ilkal_orders', JSON.stringify([order, ...prev]));
-    } catch {
-      localStorage.setItem('ilkal_orders', JSON.stringify([order]));
-    }
+      await apiClient.post('/payment-failure', {
+        razorpay_order_id: ref.razorpay_order_id,
+        mobile_number: contact.mobile,
+        amount: ref.amount,
+        currency: ref.currency,
+        reason,
+        source: 'client',
+        ...extra,
+      });
+    } catch { /* best-effort */ }
   };
+  const reportFailureBeacon = (reason) => {
+    const ref = inFlightRef.current;
+    if (!ref) return;
+    try {
+      const blob = new Blob([JSON.stringify({
+        razorpay_order_id: ref.razorpay_order_id,
+        mobile_number: contact.mobile,
+        amount: ref.amount,
+        currency: ref.currency,
+        reason,
+        source: 'beacon',
+      })], { type: 'text/plain' });
+      navigator.sendBeacon(`${API_BASE_URL}/ik/customer/payment-failure`, blob);
+    } catch { /* best-effort */ }
+  };
+  useEffect(() => {
+    const onUnload = () => {
+      if (inFlightRef.current) reportFailureBeacon('browser_close');
+    };
+    window.addEventListener('beforeunload', onUnload);
+    window.addEventListener('pagehide', onUnload);
+    return () => {
+      window.removeEventListener('beforeunload', onUnload);
+      window.removeEventListener('pagehide', onUnload);
+    };
+  }, []);
 
   const payNow = async () => {
     if (!valid) { setShowErrors(true); toast.error('Please complete the highlighted fields'); return; }
@@ -259,7 +292,12 @@ export default function Checkout() {
       const { order_id, amount: amountInPaise, currency, key_id, user_id } = createBody.data || {};
       if (!order_id || !key_id) throw new Error('Invalid order response from server');
 
-      // 2) Open the Razorpay checkout modal.
+      inFlightRef.current = {
+        razorpay_order_id: order_id,
+        amount: total,
+        currency: currency || 'INR',
+      };
+
       await new Promise((resolve, reject) => {
         const rzp = new Razorpay({
           key: key_id,
@@ -276,11 +314,13 @@ export default function Checkout() {
           notes: { combined_codes: items.map((i) => i.code).join(',') },
           theme: { color: '#7B1E3A' },
           modal: {
-            ondismiss: () => reject(new Error('Payment cancelled')),
+            ondismiss: () => {
+              reportFailure('user_cancelled');
+              reject(new Error('Payment cancelled'));
+            },
           },
           handler: async (rzpResponse) => {
             try {
-              // 3) Verify the payment on the back-end.
               const verifyRes = await apiClient.post('/verify-payment', {
                 razorpay_order_id: rzpResponse.razorpay_order_id,
                 razorpay_payment_id: rzpResponse.razorpay_payment_id,
@@ -292,32 +332,36 @@ export default function Checkout() {
               });
               const verifyBody = verifyRes.data;
               if (!verifyBody?.successstatus) {
+                await reportFailure('verify_failed', {
+                  razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                });
                 reject(new Error(verifyBody?.message || 'Payment verification failed'));
                 return;
               }
 
-              const order = {
-                id: verifyBody.data?.order_id || rzpResponse.razorpay_order_id,
-                paymentId: rzpResponse.razorpay_payment_id,
-                items, contact, addr,
-                subtotal, bulkDiscount, offer, offerPercent, offerDiscount,
-                payable, baseAmount, gstAmount, gstRate, gstPercent, gstDescription,
-                shipping, total,
-                bulkOrder: bulkEligible,
-                placedAt: new Date().toISOString(),
-                payment: verifyBody.data,
-              };
-              persistOrder(order);
+              inFlightRef.current = null;
+              localStorage.setItem('ilkal_last_order', JSON.stringify(verifyBody.data));
+              try {
+                const prev = JSON.parse(localStorage.getItem('ilkal_orders')) || [];
+                localStorage.setItem('ilkal_orders', JSON.stringify([verifyBody.data, ...prev]));
+              } catch {
+                localStorage.setItem('ilkal_orders', JSON.stringify([verifyBody.data]));
+              }
               clear();
               toast.success('Payment successful');
               nav('/confirmation');
               resolve();
             } catch (err) {
+              await reportFailure('verify_exception');
               reject(err);
             }
           },
         });
         rzp.on('payment.failed', (resp) => {
+          reportFailure('payment_failed', {
+            razorpay_payment_id: resp?.error?.metadata?.payment_id || null,
+            method: resp?.error?.source || null,
+          });
           reject(new Error(resp?.error?.description || 'Payment failed'));
         });
         rzp.open();
@@ -327,6 +371,7 @@ export default function Checkout() {
         toast.error(err?.message || 'Payment could not be completed');
       }
     } finally {
+      inFlightRef.current = null;
       setPaying(false);
     }
   };
