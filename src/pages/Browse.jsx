@@ -489,12 +489,28 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
           transition={{ duration: 0.7, ease: 'easeOut' }}
           className="absolute inset-0 w-full h-full object-cover" />
         <div className={`absolute inset-0 bg-gradient-to-t from-ilkal-deep/60 via-transparent to-transparent transition-opacity duration-500 ${hover ? 'opacity-100' : 'opacity-0'}`} />
-        {s.handloom && /^(yes|pure|s|handloom)/i.test(s.handloom) && (
-          <span className="absolute top-2 left-2 chip bg-white/95 shadow text-[10px]">Handloom</span>
-        )}
-        <span className="absolute top-2 right-2 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/95 text-[10px] shadow">
-          <Star className="w-3 h-3 fill-ilkal-gold text-ilkal-gold" />{s.rating}
-        </span>
+        <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-2 pointer-events-none">
+          <div className="flex flex-col items-start gap-1 min-w-0 max-w-[70%]">
+            {s.handloom && /^(yes|pure|s|handloom)/i.test(s.handloom) && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-white/95 text-ilkal-maroon text-[9px] sm:text-[10px] font-semibold shadow truncate max-w-full">
+                Handloom
+              </span>
+            )}
+            {s.popular && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ilkal-gold text-ilkal-deep text-[9px] sm:text-[10px] font-bold shadow truncate max-w-full">
+                <Flame className="w-3 h-3 shrink-0" /> Popular
+              </span>
+            )}
+            {s.trending && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ilkal-rose text-white text-[9px] sm:text-[10px] font-bold shadow truncate max-w-full">
+                <TrendingUp className="w-3 h-3 shrink-0" /> Trending
+              </span>
+            )}
+          </div>
+          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/95 text-[9px] sm:text-[10px] font-semibold shadow shrink-0">
+            <Star className="w-3 h-3 fill-ilkal-gold text-ilkal-gold" />{s.rating}
+          </span>
+        </div>
         <span role="button" tabIndex={0}
           onClick={(e) => { e.stopPropagation(); setLiked(l => !l); }}
           className={`absolute bottom-10 right-2 w-8 h-8 rounded-full grid place-items-center shadow transition-all duration-300 ${
@@ -502,23 +518,13 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
           }`}>
           <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-white' : ''}`} />
         </span>
-        <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur text-white text-[10px] font-medium shadow">
-          <Camera className="w-3 h-3" /> {photoCount} live
-        </span>
-        <span className="absolute top-10 left-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 border border-green-200 text-[9px] font-semibold shadow">
-          Natural light • No edits
-        </span>
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {s.popular && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ilkal-gold text-ilkal-deep text-[10px] font-bold shadow">
-              <Flame className="w-3 h-3" /> Popular
-            </span>
-          )}
-          {s.trending && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ilkal-rose text-white text-[10px] font-bold shadow">
-              <TrendingUp className="w-3 h-3" /> Trending
-            </span>
-          )}
+        <div className="absolute bottom-2 left-2 right-12 flex flex-wrap items-center gap-1 pointer-events-none">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur text-white text-[9px] sm:text-[10px] font-medium shadow">
+            <Camera className="w-3 h-3 shrink-0" /> {photoCount} live
+          </span>
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 border border-green-200 text-[8px] sm:text-[9px] font-semibold shadow">
+            Natural light
+          </span>
         </div>
       </div>
       <div className="p-3 flex flex-col flex-1">

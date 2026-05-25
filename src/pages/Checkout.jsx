@@ -347,9 +347,13 @@ export default function Checkout() {
               } catch {
                 localStorage.setItem('ilkal_orders', JSON.stringify([verifyBody.data]));
               }
+              const orderRef =
+                verifyBody.data?.order_details?.order_id ||
+                rzpResponse.razorpay_order_id;
+              sessionStorage.setItem('ilkal_confirmation_token', String(orderRef || 'ok'));
               clear();
               toast.success('Payment successful');
-              nav('/confirmation');
+              nav('/confirmation', { replace: true });
               resolve();
             } catch (err) {
               await reportFailure('verify_exception');

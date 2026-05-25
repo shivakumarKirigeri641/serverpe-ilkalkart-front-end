@@ -12,10 +12,17 @@ const fmtINR = (n) =>
 
 export default function Confirmation() {
   const [data, setData] = useState(null);
+  const [authorized, setAuthorized] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
+    const token = sessionStorage.getItem('ilkal_confirmation_token');
+    if (!token) {
+      navigate('/browse', { replace: true });
+      return;
+    }
+    setAuthorized(true);
     try { setData(JSON.parse(localStorage.getItem('ilkal_last_order'))); } catch {}
-  }, []);
+  }, [navigate]);
 
   const copyOrderId = async (value) => {
     if (!value) return;
@@ -26,6 +33,8 @@ export default function Confirmation() {
       toast.error('Could not copy');
     }
   };
+
+  if (!authorized) return null;
 
   if (!data || !data.payment_details) {
     return (
