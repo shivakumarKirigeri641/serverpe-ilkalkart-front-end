@@ -50,16 +50,21 @@ export default function Confirmation() {
   const items = data.cart_items?.data?.items || [];
   const platform = data.platform_details || {};
   const gst = data.gst_details || {};
+  const offer = data.offer_details || null;
   const invoice = data.invoice_details || {};
   const user = data.user_details || {};
   const addr = data.user_address || {};
 
   const gstPercent = Number(gst.gst_percent || 0);
   const gstRate = gstPercent / 100;
-  const subtotal = items.reduce(
+  const offerPercent = Number(offer?.offer_percent_value || 0);
+  const grossSubtotal = items.reduce(
     (sum, it) => sum + Number(it.quantity || 0) * Number(it.base_price || 0),
     0,
   );
+  const offerDiscount =
+    offerPercent > 0 ? +((grossSubtotal * offerPercent) / 100).toFixed(2) : 0;
+  const subtotal = +(grossSubtotal - offerDiscount).toFixed(2);
   const baseAmount = gstRate > 0 ? +(subtotal / (1 + gstRate)).toFixed(2) : subtotal;
   const gstAmount = +(subtotal - baseAmount).toFixed(2);
   const total = Number(payment.amount) || subtotal;
@@ -182,6 +187,16 @@ export default function Confirmation() {
         </div>
 
         <div className="p-5 text-sm">
+          {offerPercent > 0 && (
+            <>
+              <Row label="Gross sub-total" value={fmtINR(grossSubtotal)} />
+              <Row
+                label={`Offer${offer?.title ? ` — ${offer.title}` : ''} (${offerPercent}%)`}
+                value={`− ${fmtINR(offerDiscount)}`}
+                discount
+              />
+            </>
+          )}
           <Row label="Sub-total (incl. GST)" value={fmtINR(subtotal)} />
           <Row label="Item value (excl. GST)" value={fmtINR(baseAmount)} />
           <Row
@@ -265,11 +280,11 @@ export default function Confirmation() {
   );
 }
 
-function Row({ label, value, bold }) {
+function Row({ label, value, bold, discount }) {
   return (
     <div className={`flex justify-between py-1 ${bold ? 'font-bold text-ilkal-maroon text-base' : ''}`}>
       <span className="opacity-80">{label}</span>
-      <span>{value}</span>
+      <span className={discount ? 'text-green-700 font-semibold' : ''}>{value}</span>
     </div>
   );
 }
