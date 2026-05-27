@@ -10,10 +10,10 @@ import About from './pages/About.jsx';
 import Contact from './pages/Contact.jsx';
 import Checkout from './pages/Checkout.jsx';
 import Confirmation from './pages/Confirmation.jsx';
-import Login from './pages/Login.jsx';
-import Dashboard from './pages/Dashboard.jsx';
 import Feedback from './pages/Feedback.jsx';
 import Bulk from './pages/Bulk.jsx';
+import PurchaseHistory from './pages/PurchaseHistory.jsx';
+import Verify from './pages/Verify.jsx';
 
 export default function App() {
   return (
@@ -30,9 +30,9 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/confirmation" element={<Confirmation />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/purchase-history" element={<PurchaseHistory />} />
+          <Route path="/verify/:qrcode" element={<Verify />} />
         </Routes>
       </main>
       <Footer />

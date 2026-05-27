@@ -1,19 +1,17 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Sparkles, ShoppingBag, User, Truck } from 'lucide-react';
+import { Home, Sparkles, ShoppingBag, Truck, Package } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
-import { useAuth } from '../context/AuthContext.jsx';
 
 const items = [
-  { to: '/',        label: 'Home',    icon: Home },
-  { to: '/browse',  label: 'Browse',  icon: Sparkles },
-  { to: '/track',   label: 'Track',   icon: Truck },
-  { to: '/checkout',label: 'Bag',     icon: ShoppingBag, badge: 'cart' },
-  { to: '/account', label: 'Account', icon: User, dynamic: true }
+  { to: '/',                  label: 'Home',     icon: Home },
+  { to: '/browse',            label: 'Browse',   icon: Sparkles },
+  { to: '/track',             label: 'Track',    icon: Truck },
+  { to: '/checkout',          label: 'Bag',      icon: ShoppingBag, badge: 'cart' },
+  { to: '/purchase-history',  label: 'History',  icon: Package }
 ];
 
 export default function MobileBottomNav() {
   const { count } = useCart();
-  const { user } = useAuth();
 
   return (
     <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-ilkal-gold/30 shadow-[0_-4px_20px_rgba(123,30,58,0.08)]"
@@ -21,10 +19,9 @@ export default function MobileBottomNav() {
       <ul className="grid grid-cols-5 max-w-md mx-auto">
         {items.map((it) => {
           const Icon = it.icon;
-          const to = it.dynamic ? (user ? '/dashboard' : '/login') : it.to;
           return (
             <li key={it.label}>
-              <NavLink to={to} end={to === '/'}
+              <NavLink to={it.to} end={it.to === '/'}
                 className={({ isActive }) =>
                   `relative flex flex-col items-center justify-center py-2 gap-0.5 transition ${
                     isActive ? 'text-ilkal-maroon' : 'text-ilkal-deep/70'

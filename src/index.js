@@ -5,7 +5,6 @@ import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App.jsx';
 import { CartProvider } from './context/CartContext.jsx';
-import { AuthProvider } from './context/AuthContext.jsx';
 import { CatalogProvider } from './context/CatalogContext.jsx';
 import './index.css';
 
@@ -23,24 +22,22 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <CartProvider>
-            <CatalogProvider>
-              <App />
-              <Toaster
-                position="top-center"
-                toastOptions={{
-                  style: {
-                    background: '#7B1E3A',
-                    color: '#FFF8F0',
-                    borderRadius: '999px',
-                    fontFamily: 'Poppins',
-                  },
-                }}
-              />
-            </CatalogProvider>
-          </CartProvider>
-        </AuthProvider>
+        <CartProvider>
+          <CatalogProvider>
+            <App />
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                style: {
+                  background: '#7B1E3A',
+                  color: '#FFF8F0',
+                  borderRadius: '999px',
+                  fontFamily: 'Poppins',
+                },
+              }}
+            />
+          </CatalogProvider>
+        </CartProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>,

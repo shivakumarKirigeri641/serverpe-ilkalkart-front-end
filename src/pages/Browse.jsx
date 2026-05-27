@@ -212,6 +212,27 @@ export default function Browse() {
 
   return (
     <div className="max-w-[1400px] mx-auto px-3 sm:px-5 py-6">
+      {/* No-login reassurance banner */}
+      <div className="mb-4 rounded-2xl border border-green-200 bg-gradient-to-r from-green-50 via-white to-ilkal-cream/60 px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] font-bold tracking-wide border border-green-200">
+            NO LOGIN • NO SIGNUP • NO ACCOUNT
+          </span>
+          <span className="text-xs opacity-70 hidden sm:inline">Just shop, like a friendly local shop.</span>
+        </div>
+        <ol className="flex items-center gap-1 sm:gap-2 flex-wrap text-[11px] sm:text-xs font-medium text-ilkal-deep">
+          {['Shortlist', 'Add to cart', 'Fill details', 'Pay', 'Done', 'Doorstep'].map((s, i, a) => (
+            <li key={s} className="flex items-center gap-1 sm:gap-2">
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white border border-ilkal-gold/30 shadow-sm">
+                <span className="w-4 h-4 rounded-full silk-gradient text-white text-[9px] font-bold grid place-items-center">{i + 1}</span>
+                {s}
+              </span>
+              {i < a.length - 1 && <span className="text-ilkal-gold">→</span>}
+            </li>
+          ))}
+        </ol>
+      </div>
+
       {/* Header / search */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -221,6 +242,9 @@ export default function Browse() {
             <span className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-800 bg-green-100 border border-green-200 rounded-full px-2.5 py-1">
               <Camera className="w-3 h-3" /> Live footage • Natural daylight • Zero edits
             </span>
+            <p className="mt-2 text-[11px] italic text-ilkal-deep/80 max-w-xl">
+              📷 Disclaimer: A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {items.length > 0 && (
@@ -528,8 +552,16 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
         </div>
       </div>
       <div className="p-3 flex flex-col flex-1">
-        <h3 className="font-semibold text-ilkal-maroon text-sm line-clamp-1">{s.name}</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="font-semibold text-ilkal-maroon text-sm line-clamp-1">{s.name}</h3>
+          <span className="shrink-0 text-[10px] font-bold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-1.5 py-0.5 rounded-full">
+            {s.id}
+          </span>
+        </div>
         <p className="text-[11px] opacity-70 line-clamp-1">{s.color} • {s.material || 'Ilkal weave'}</p>
+        <p className="text-[10px] italic opacity-70 mt-0.5 leading-snug">
+          📷 Slight colour variation possible due to natural lighting.
+        </p>
         <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
           <span className="font-bold text-base text-ilkal-maroon">₹{s.price.toLocaleString('en-IN')}</span>
           {s.mrp > s.price && (

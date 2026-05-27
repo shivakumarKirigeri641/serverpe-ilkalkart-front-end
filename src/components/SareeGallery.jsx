@@ -115,6 +115,9 @@ export default function SareeGallery({ saree, onClose }) {
             <div>
               <h2 className="font-serif text-2xl sm:text-3xl text-ilkal-maroon">{saree.name}</h2>
               <p className="text-sm opacity-70">{saree.color}</p>
+              <span className="inline-block mt-1 text-[11px] font-bold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-2 py-0.5 rounded-full">
+                {saree.id}
+              </span>
             </div>
             {saree.handloom && /^(yes|pure|s|handloom)/i.test(saree.handloom) && (
               <span className="chip">Handloom</span>
@@ -155,6 +158,10 @@ export default function SareeGallery({ saree, onClose }) {
           <div className="mt-4 p-3 rounded-2xl bg-ilkal-cream border border-ilkal-gold/30 text-xs leading-relaxed">
             💛 <b className="text-ilkal-maroon">Hand-picked promise:</b> I personally selected this saree from the loom in Ilkal village.
             Each piece is washed gently, ironed, and packed in muslin cloth before reaching you.
+          </div>
+
+          <div className="mt-3 p-3 rounded-2xl bg-yellow-50 border border-yellow-200 text-[11px] leading-relaxed text-yellow-900">
+            📷 <b>Disclaimer:</b> A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
           </div>
 
           <div className="mt-5 sticky bottom-0 bg-white pt-3">

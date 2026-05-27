@@ -394,12 +394,25 @@ export default function Checkout() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-sm text-green-900 flex items-start gap-2">
-          <ShieldCheck className="w-4 h-4 text-green-700 mt-0.5 shrink-0" />
-          <span>
-            <b>No signup required.</b> Just fill in your delivery details below and pay — your saree
-            will be hand-packed and dispatched straight to your doorstep.
-          </span>
+        <div className="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-sm text-green-900">
+          <div className="flex items-start gap-2">
+            <ShieldCheck className="w-4 h-4 text-green-700 mt-0.5 shrink-0" />
+            <span>
+              <b>No login. No signup. No account.</b> Just fill in your delivery details below and pay —
+              your saree will be hand-packed and shipped straight to your doorstep.
+            </span>
+          </div>
+          <ol className="mt-2 flex items-center gap-1 sm:gap-2 flex-wrap text-[11px] font-medium text-green-900/90 pl-6">
+            {['Shortlist', 'Add to cart', 'Fill details', 'Pay', 'Done', 'Doorstep'].map((s, i, a) => (
+              <li key={s} className="flex items-center gap-1 sm:gap-2">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-green-200">
+                  <span className="w-3.5 h-3.5 rounded-full bg-green-700 text-white text-[9px] font-bold grid place-items-center">{i + 1}</span>
+                  {s}
+                </span>
+                {i < a.length - 1 && <span className="text-green-700/60">→</span>}
+              </li>
+            ))}
+          </ol>
         </div>
 
         {bulkEligible ? (
@@ -443,7 +456,12 @@ export default function Checkout() {
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <div className="min-w-0 pr-2">
-                      <h3 className="font-semibold text-ilkal-maroon truncate">{it.name}</h3>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <h3 className="font-semibold text-ilkal-maroon truncate">{it.name}</h3>
+                        <span className="shrink-0 text-[10px] font-bold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-1.5 py-0.5 rounded-full">
+                          {it.id}
+                        </span>
+                      </div>
                       <dl className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] leading-tight">
                         {it.color && (<><dt className="opacity-60">Color</dt><dd className="text-ilkal-deep font-medium truncate">{it.color}</dd></>)}
                         {it.material && (<><dt className="opacity-60">Material</dt><dd className="text-ilkal-deep font-medium truncate">{it.material}</dd></>)}
@@ -474,6 +492,9 @@ export default function Checkout() {
               </div>
             ))}
           </div>
+          <p className="mt-3 text-[11px] italic text-ilkal-deep/80">
+            📷 Disclaimer: A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
+          </p>
         </Section>
 
         {/* Contact */}

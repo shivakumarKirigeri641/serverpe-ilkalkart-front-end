@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Send, Image as ImageIcon, X, MessageSquareHeart, ArrowRight, Loader2 } from 'lucide-react';
+import { Star, Send, Image as ImageIcon, X, MessageSquareHeart, ArrowRight, Loader2, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apiClient, uploadsUrl } from '../utils/api.js';
 
@@ -227,37 +227,7 @@ export default function Feedback() {
             <p className="opacity-70">No feedback yet — be the very first to write one.</p>
           </div>
         ) : (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <AnimatePresence>
-              {list.map((f, i) => (
-                <motion.div key={f.id}
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }} transition={{ delay: i * 0.04 }}
-                  className="bg-white rounded-3xl p-5 shadow-md border border-ilkal-gold/20">
-                  <div className="flex items-center gap-1 text-ilkal-gold">
-                    {Array.from({ length: 5 }).map((_, k) => (
-                      <Star key={k} className={`w-4 h-4 ${k < Number(f.rating || 0) ? 'fill-ilkal-gold' : 'text-ilkal-gold/30'}`} />
-                    ))}
-                  </div>
-                  {f.pic_path && (
-                    <img
-                      src={uploadsUrl(f.pic_path)}
-                      alt={f.user_name}
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      className="mt-3 rounded-2xl object-cover w-full max-h-56 border border-ilkal-gold/20"
-                    />
-                  )}
-                  <p className="mt-3 text-sm leading-relaxed opacity-90">“{f.message}”</p>
-                  <p className="mt-3 font-semibold text-ilkal-maroon text-sm">— {f.user_name}</p>
-                  {f.created_at && (
-                    <p className="text-[11px] opacity-50">
-                      {new Date(f.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+          <FeedbackCarousel list={list} />
         )}
       </div>
 
@@ -275,5 +245,99 @@ function Field({ label, children }) {
       <span className="text-xs font-semibold opacity-80">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
+  );
+}
+
+function FeedbackCarousel({ list }) {
+  const trackRef = useRef(null);
+  const offsetRef = useRef(0);
+  const lastTsRef = useRef(0);
+  const rafRef = useRef(0);
+  const [paused, setPaused] = useState(false);
+  const SPEED = 40;
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const tick = (ts) => {
+      const last = lastTsRef.current || ts;
+      const dt = (ts - last) / 1000;
+      lastTsRef.current = ts;
+      if (!paused) {
+        const halfWidth = track.scrollWidth / 2;
+        if (halfWidth > 0) {
+          offsetRef.current = (offsetRef.current + SPEED * dt) % halfWidth;
+          track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [paused, list.length]);
+
+  const doubled = [...list, ...list];
+
+  return (
+    <div
+      className="relative mt-4 overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onTouchStart={() => setPaused(true)}
+      onTouchEnd={() => setTimeout(() => setPaused(false), 1200)}
+      style={{
+        WebkitMaskImage:
+          'linear-gradient(to right, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%)',
+        maskImage:
+          'linear-gradient(to right, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%)',
+      }}
+    >
+      <div
+        ref={trackRef}
+        className="flex gap-4 will-change-transform"
+        style={{ width: 'max-content' }}
+      >
+        {doubled.map((f, idx) => (
+          <article
+            key={`${f.id}-${idx}`}
+            aria-hidden={idx >= list.length}
+            className="shrink-0 w-[85vw] sm:w-[360px] lg:w-[340px]
+                       bg-white rounded-3xl p-5 shadow-md border border-ilkal-gold/20 flex flex-col">
+            <div className="flex items-center gap-1 text-ilkal-gold">
+              {Array.from({ length: 5 }).map((_, k) => (
+                <Star key={k} className={`w-4 h-4 ${k < Number(f.rating || 0) ? 'fill-ilkal-gold' : 'text-ilkal-gold/30'}`} />
+              ))}
+            </div>
+            {f.pic_path && (
+              <img
+                src={uploadsUrl(f.pic_path)}
+                alt={f.user_name}
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                className="mt-3 rounded-2xl object-cover w-full max-h-56 border border-ilkal-gold/20"
+              />
+            )}
+            <p className="mt-3 text-sm leading-relaxed opacity-90 flex-1">“{f.message}”</p>
+            <p className="mt-3 font-semibold text-ilkal-maroon text-sm">— {f.user_name}</p>
+            {f.created_at && (
+              <p className="text-[11px] opacity-50">
+                {new Date(f.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
+            )}
+          </article>
+        ))}
+      </div>
+
+      <div className="mt-3 flex items-center justify-center">
+        <button
+          type="button"
+          onClick={() => setPaused((p) => !p)}
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-ilkal-maroon/80 hover:text-ilkal-maroon px-2 py-1 rounded-full">
+          {paused ? <><Play className="w-3 h-3" /> Play</> : <><Pause className="w-3 h-3" /> Pause</>}
+        </button>
+      </div>
+    </div>
   );
 }

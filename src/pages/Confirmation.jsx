@@ -255,6 +255,9 @@ export default function Confirmation() {
                 </span>
               </li>
             </ul>
+            <p className="mt-3 text-[11px] italic opacity-80">
+              📷 Disclaimer: A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
+            </p>
           </div>
         </div>
       </div>

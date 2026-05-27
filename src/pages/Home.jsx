@@ -212,13 +212,14 @@ export default function Home() {
             </p>
           </div>
 
-          <ol className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          <ol className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {[
-              { n: '1', t: 'Browse',    d: 'Open the catalogue and find the saree that speaks to you.' },
-              { n: '2', t: 'Checkout',  d: 'Add to bag and continue — no login screen, ever.' },
+              { n: '1', t: 'Shortlist',    d: 'Browse the catalogue and shortlist the sarees you love.' },
+              { n: '2', t: 'Add to cart',  d: 'Drop them in your bag — no login screen, ever.' },
               { n: '3', t: 'Fill details', d: 'Share only your name, mobile and delivery address.' },
               { n: '4', t: 'Pay securely', d: 'Complete payment through a trusted gateway.' },
-              { n: '5', t: 'Dispatch & deliver', d: 'I hand-pack your saree and ship it to your door.' }
+              { n: '5', t: 'Done!',        d: 'Order confirmed instantly. You sit back and relax.' },
+              { n: '6', t: 'Doorstep',     d: 'I hand-pack your saree and ship it to your door.' }
             ].map((s, i) => (
               <motion.li key={s.n}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -234,8 +235,8 @@ export default function Home() {
           </ol>
 
           <p className="mt-6 text-center text-xs sm:text-sm opacity-80">
-            Login is <b>completely optional</b> — required only if you’d like access to
-            your <b>dashboard</b>, <b>purchase history</b>, <b>profile updates</b> and more.
+            No account needed — just shop. Use the <b>Purchase History</b> tab anytime with the
+            mobile number you placed the order from.
           </p>
         </div>
       </section>
