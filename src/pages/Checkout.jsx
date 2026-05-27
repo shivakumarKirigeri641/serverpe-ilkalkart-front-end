@@ -48,6 +48,8 @@ export default function Checkout() {
   const [contact, setContact] = useState({ name: '', mobile: '', email: '' });
   const [addr, setAddr] = useState({ id: null, houseNo: '', line1: '', line2: '', area: '', landmark: '', city: '', district: '', state: '', pin: '', lat: null, lng: null, display: '' });
   const [paying, setPaying] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [showTermsError, setShowTermsError] = useState(false);
   const statesQuery = useStatesUnions();
   const stateOptions = statesQuery.data || [];
 
@@ -505,13 +507,16 @@ export default function Checkout() {
               invalid={showErr('name')}
               errorText="Please enter your full name" />
             <div>
-              <Input label="Mobile *" value={contact.mobile} maxLength={10} inputMode="numeric"
+              <Input label="WhatsApp Mobile *" value={contact.mobile} maxLength={10} inputMode="numeric"
                 onChange={v => setContact({ ...contact, mobile: v.replace(/\D/g, '') })}
                 invalid={showErr('mobile')}
-                errorText="Enter a valid 10-digit mobile starting 6-9" />
-              <p className="mt-1 text-[11px] opacity-70 leading-snug">
-                Once your mobile number is entered, if you've previously ordered with us your
-                saved address will be auto-filled.
+                errorText="Enter a valid 10-digit WhatsApp number starting 6-9" />
+              <p className="mt-1.5 text-[11px] leading-snug inline-flex items-start gap-1.5 text-green-800 bg-green-50 border border-green-200 rounded-lg px-2 py-1.5 w-full">
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 mt-0.5 shrink-0 fill-green-600"><path d="M20.52 3.48A11.86 11.86 0 0 0 12.02 0C5.4 0 .02 5.38.02 12c0 2.11.55 4.17 1.6 5.99L0 24l6.18-1.62A11.94 11.94 0 0 0 12.02 24c6.62 0 12-5.38 12-12 0-3.2-1.25-6.21-3.5-8.52ZM12.02 21.8a9.8 9.8 0 0 1-5-1.37l-.36-.22-3.66.96.98-3.57-.23-.37A9.79 9.79 0 1 1 21.82 12a9.78 9.78 0 0 1-9.8 9.8Zm5.62-7.34c-.31-.16-1.83-.9-2.11-1-.28-.1-.49-.16-.7.15-.21.31-.8 1-.98 1.21-.18.2-.36.23-.67.07-.31-.16-1.31-.48-2.5-1.55-.92-.82-1.55-1.83-1.73-2.14-.18-.31-.02-.48.14-.63.14-.14.31-.36.47-.54.16-.18.21-.31.31-.51.1-.21.05-.39-.03-.54-.08-.16-.7-1.68-.96-2.3-.25-.6-.51-.52-.7-.53l-.6-.01c-.21 0-.54.08-.83.39-.28.31-1.08 1.06-1.08 2.58 0 1.51 1.11 2.98 1.26 3.18.16.21 2.18 3.32 5.28 4.66.74.32 1.32.51 1.77.66.74.23 1.41.2 1.94.12.59-.09 1.83-.74 2.09-1.46.26-.72.26-1.34.18-1.46-.08-.13-.28-.21-.59-.36Z"/></svg>
+                <span>
+                  <b>Please share your WhatsApp number.</b> I personally send photos &amp; video of your saree
+                  (before packing) and live delivery updates here. If you've ordered before, your address auto-fills.
+                </span>
               </p>
             </div>
             <Input className="sm:col-span-2" label="Email (optional)" type="email" value={contact.email}
@@ -607,6 +612,12 @@ export default function Checkout() {
           <Row label="Total Payable" value={`₹${total.toLocaleString('en-IN')}`} bold />
           <p className="mt-2 text-xs opacity-70">All prices are inclusive of GST. You won’t be charged anything extra.</p>
 
+          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-[11px] leading-relaxed text-red-900">
+            <b>🛡️ Beware of scams:</b> we <u>never</u> ask for UPI transfers to personal numbers, OTPs over the phone,
+            or extra &quot;customs/COD&quot; fees after checkout. Pay <b>only</b> through the secure gateway button below —
+            anything else claiming to be Ilkal Kart is fake.
+          </div>
+
           <div className="mt-5">
             {!otpVerified ? (
               <div className="rounded-2xl border border-ilkal-gold/30 bg-ilkal-cream/60 p-4 space-y-3">
@@ -616,7 +627,12 @@ export default function Checkout() {
                     <span>Verify mobile to continue</span>
                   </div>
                   <p className="mt-1 text-[11px] opacity-70 leading-snug">
-                    We'll send a 4-digit OTP to <b>{contact.mobile || '— —'}</b> to confirm your order.
+                    We&apos;ll send a 4-digit OTP to <b>{contact.mobile || '— —'}</b> to confirm your order.
+                  </p>
+                  <p className="mt-1.5 text-[11px] leading-snug text-green-900 bg-green-50 border border-green-200 rounded-lg px-2 py-1.5">
+                    <b>🔒 Sender ID check:</b> our SMS arrives <b>only</b> from the header
+                    <span className="font-mono mx-1">*-SRVRPE-*</span> (e.g. <span className="font-mono">VM-SRVRPE</span>, <span className="font-mono">JD-SRVRPE</span>).
+                    Any OTP &quot;from Ilkal Kart&quot; on a different header is fake — <b>do not share it</b>.
                   </p>
                 </div>
 
@@ -662,7 +678,7 @@ export default function Checkout() {
                       </button>
                     </div>
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="opacity-60">Didn't get the code?</span>
+                      <span className="opacity-60">Didn&apos;t get the code?</span>
                       <button
                         type="button"
                         onClick={sendOtp}
@@ -671,6 +687,11 @@ export default function Checkout() {
                         Resend OTP
                       </button>
                     </div>
+                    <p className="text-[11px] text-red-800 leading-snug">
+                      🚨 The OTP SMS appears <b>only</b> from the sender header
+                      <span className="font-mono mx-1">*-SRVRPE-*</span>. Ignore lookalikes like &quot;ILKAL&quot;,
+                      &quot;IKART&quot;, etc. We will <b>never</b> ask you to share this OTP on a call.
+                    </p>
                   </div>
                 )}
               </div>
@@ -682,7 +703,44 @@ export default function Checkout() {
             )}
           </div>
 
-          <button disabled={!valid || !otpVerified || paying} onClick={payNow}
+          {/* Terms & Conditions consent — required before payment */}
+          <div className={`mt-3 rounded-2xl border p-3 sm:p-3.5 transition ${
+            showTermsError && !agreedTerms
+              ? 'border-red-300 bg-red-50'
+              : agreedTerms
+                ? 'border-green-200 bg-green-50'
+                : 'border-ilkal-gold/30 bg-ilkal-cream/60'
+          }`}>
+            <label className="flex items-start gap-2.5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={agreedTerms}
+                onChange={(e) => { setAgreedTerms(e.target.checked); if (e.target.checked) setShowTermsError(false); }}
+                className="mt-0.5 w-4 h-4 shrink-0 accent-ilkal-maroon cursor-pointer"
+              />
+              <span className="text-[12px] leading-relaxed text-ilkal-deep">
+                I have read &amp; agreed to the <b className="text-ilkal-maroon">Terms &amp; Conditions</b>, the
+                <b className="text-ilkal-maroon"> no-return / no-replacement policy</b>, and accept that I will
+                receive exactly what is shown in the live photos &amp; videos. I understand a slight colour
+                variation is possible due to natural lighting; that all genuine SMS will arrive only from the sender
+                header <span className="font-mono">*-SRVRPE-*</span> and that every photo/video I receive will carry
+                an <b>&quot;ilkalkart&quot;</b> watermark with a live timestamp; and that all my <b>liabilities</b>{' '}
+                after successful payment are limited to what is described in the policy.
+              </span>
+            </label>
+            {showTermsError && !agreedTerms && (
+              <p className="mt-2 text-[11px] font-semibold text-red-700 pl-6.5">
+                Please tick the box to agree before paying.
+              </p>
+            )}
+          </div>
+
+          <button
+            disabled={!valid || !otpVerified || paying}
+            onClick={() => {
+              if (!agreedTerms) { setShowTermsError(true); toast.error('Please agree to the Terms & Conditions to continue'); return; }
+              payNow();
+            }}
             className="btn-primary w-full mt-3 disabled:opacity-60 disabled:cursor-not-allowed">
             {paying ? (
               <>

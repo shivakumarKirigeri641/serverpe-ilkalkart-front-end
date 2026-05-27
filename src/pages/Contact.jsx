@@ -5,6 +5,7 @@ import { Mail, Send, MessageCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { apiClient } from '../utils/api.js';
+import ScamWarning from '../components/ScamWarning.jsx';
 
 export default function Contact() {
   const { queryTypes } = useCatalog();
@@ -113,6 +114,8 @@ export default function Contact() {
         .input { width:100%; padding: 10px 14px; border-radius: 14px; background:#FFF8F0; border:1px solid rgba(201,162,39,0.3); outline:none; }
         .input:focus { border-color:#7B1E3A; }
       `}</style>
+
+      <ScamWarning />
     </div>
   );
 }

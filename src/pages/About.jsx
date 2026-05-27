@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { MapPin, Plane, Sparkles, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, Code2 } from 'lucide-react';
 import logo from '../images/logo/ilkalKart_logo.png';
+import ScamWarning from '../components/ScamWarning.jsx';
 
 export default function About() {
   return (
@@ -71,7 +72,7 @@ export default function About() {
             { icon: Camera, t: 'Real photos & videos — zero AI, zero edits', d: 'Every saree on this platform is captured by me, on my mobile phone, in natural daylight. No AI-generated imagery, no editing, no filters, no studio lighting, no DSLR depth-of-field, no colour grading. What you see on screen is exactly what arrives at your doorstep.' },
             { icon: QrCode, t: 'Premium packing with scannable authenticity code', d: 'Each saree is sealed inside a premium pack carrying a unique QR code. Scan it on delivery to instantly verify that the saree is a genuine, hand-picked Ilkal piece — your built-in proof of purity.' },
             { icon: Gift, t: 'A heartfelt unboxing — not just a parcel', d: 'Inside the box you’ll find a personal thank-you card, a documented wrap proof, a saree-care guide, and the live photo and video I captured the moment your saree was packed. Every detail is meant to feel like the gift it is.' },
-            { icon: AlertTriangle, t: 'A clear, honest no-return policy', d: 'In keeping with the transparency you deserve: there are no returns or replacements. Because I provide complete photographic and video proof of the saree’s condition before dispatch, what reaches you is exactly what you approved — clean, untouched and verified.' }
+            { icon: AlertTriangle, t: 'A clear, honest no-return/replace policy', d: 'In keeping with the transparency you deserve: there are no returns or replacements. Because I provide complete photographic and video proof of the saree’s condition before dispatch, what reaches you is exactly what you approved — clean, untouched and verified.' }
           ].map((c, i) => (
             <motion.div key={i}
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -140,6 +141,8 @@ export default function About() {
           <Link to="/browse" className="btn-primary mt-6 inline-flex">Start Browsing Sarees</Link>
         </div>
       </section>
+
+      <ScamWarning />
     </div>
   );
 }

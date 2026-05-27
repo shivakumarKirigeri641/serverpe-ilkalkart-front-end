@@ -235,28 +235,31 @@ export default function Browse() {
 
       {/* Header / search */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div>
-            <h1 className="font-serif text-2xl sm:text-3xl text-ilkal-maroon">Browse Ilkal Sarees</h1>
-            <p className="text-xs sm:text-sm opacity-70">{filtered.length} of {sarees.length} sarees</p>
-            <span className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-800 bg-green-100 border border-green-200 rounded-full px-2.5 py-1">
-              <Camera className="w-3 h-3" /> Live footage • Natural daylight • Zero edits
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="font-serif text-xl sm:text-3xl text-ilkal-maroon leading-tight">Browse Ilkal Sarees</h1>
+            <p className="text-xs opacity-70 mt-0.5">{filtered.length} of {sarees.length} sarees</p>
+            <span className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold text-green-800 bg-green-100 border border-green-200 rounded-full px-2 py-0.5">
+              <Camera className="w-3 h-3" /> Live · natural light · zero edits
             </span>
-            <p className="mt-2 text-[11px] italic text-ilkal-deep/80 max-w-xl">
-              📷 Disclaimer: A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
-            </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {items.length > 0 && (
               <button
                 onClick={clearBag}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-ilkal-maroon/30 text-ilkal-maroon text-sm font-semibold hover:bg-ilkal-maroon/5 transition">
-                <Trash2 className="w-4 h-4" /> Clear bag
+                aria-label="Clear bag"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-2 rounded-full bg-white border border-ilkal-maroon/30 text-ilkal-maroon text-xs sm:text-sm font-semibold hover:bg-ilkal-maroon/5 transition">
+                <Trash2 className="w-4 h-4" /> <span className="hidden sm:inline">Clear</span>
               </button>
             )}
-            <Link to="/checkout" className="btn-primary text-sm py-2 px-4"><ShoppingBag className="w-4 h-4" /> Bag</Link>
+            <Link to="/checkout" className="btn-primary text-xs sm:text-sm py-2 px-3 sm:px-4">
+              <ShoppingBag className="w-4 h-4" /> Bag
+            </Link>
           </div>
         </div>
+        <p className="text-[11px] italic text-ilkal-deep/70 -mt-1">
+          📷 A slight variation in colour is possible due to natural lighting.
+        </p>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ilkal-maroon" />
@@ -341,7 +344,7 @@ export default function Browse() {
             </div>
           ) : (
             <>
-              <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 {visibleList.map((s, i) => (
                   <SareeCard key={`${s.id}-${i}`} s={s} index={i}
                     qty={qtyOf(s.id)} add={add} inc={inc} dec={dec}
@@ -491,79 +494,102 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
   const primarySrc = s.gallery[0]?.src || PLACEHOLDER_IMG;
   const altSrc = s.gallery[1]?.src || primarySrc;
 
+  const onAdd = (e) => { e.stopPropagation(); add(s); };
+  const onInc = (e) => { e.stopPropagation(); inc(s.id); };
+  const onDec = (e) => { e.stopPropagation(); dec(s.id); };
+  const onLike = (e) => { e.stopPropagation(); setLiked((l) => !l); };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index * 0.03, 0.4) }}
-      whileHover={{ y: -4 }}
-      className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 flex flex-col group">
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(index * 0.03, 0.4), duration: 0.35 }}
+      whileHover={{ y: -3 }}
+      onClick={onOpen}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); onOpen(); } }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Open ${s.name}`}
+      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col group cursor-pointer
+                 focus:outline-none focus-visible:ring-2 focus-visible:ring-ilkal-maroon">
+      {/* PHOTO — taller 3:4 portrait for fabric feel */}
       <div
-        role="button" tabIndex={0}
-        onClick={onOpen}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }}
         onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-        className="relative aspect-[3/4] overflow-hidden text-left bg-ilkal-cream cursor-pointer focus:outline-none focus:ring-2 focus:ring-ilkal-maroon">
-        <motion.img src={primarySrc} alt={s.name}
-          animate={{ scale: hover ? 1.12 : 1, opacity: hover ? 0 : 1 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="absolute inset-0 w-full h-full object-cover" />
-        <motion.img src={altSrc} alt={`${s.name} alternate`}
-          initial={{ scale: 1.15, opacity: 0 }}
-          animate={{ scale: hover ? 1.05 : 1.15, opacity: hover ? 1 : 0 }}
+        className="relative aspect-[3/4] overflow-hidden bg-ilkal-cream">
+        <motion.img
+          src={primarySrc} alt={s.name} loading="lazy"
+          animate={{ scale: hover ? 1.08 : 1, opacity: hover ? 0 : 1 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
           className="absolute inset-0 w-full h-full object-cover" />
-        <div className={`absolute inset-0 bg-gradient-to-t from-ilkal-deep/60 via-transparent to-transparent transition-opacity duration-500 ${hover ? 'opacity-100' : 'opacity-0'}`} />
-        <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-2 pointer-events-none">
-          <div className="flex flex-col items-start gap-1 min-w-0 max-w-[70%]">
-            {s.handloom && /^(yes|pure|s|handloom)/i.test(s.handloom) && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-white/95 text-ilkal-maroon text-[9px] sm:text-[10px] font-semibold shadow truncate max-w-full">
-                Handloom
-              </span>
-            )}
-            {s.popular && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ilkal-gold text-ilkal-deep text-[9px] sm:text-[10px] font-bold shadow truncate max-w-full">
-                <Flame className="w-3 h-3 shrink-0" /> Popular
-              </span>
-            )}
-            {s.trending && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ilkal-rose text-white text-[9px] sm:text-[10px] font-bold shadow truncate max-w-full">
-                <TrendingUp className="w-3 h-3 shrink-0" /> Trending
-              </span>
-            )}
-          </div>
-          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/95 text-[9px] sm:text-[10px] font-semibold shadow shrink-0">
+        <motion.img
+          src={altSrc} alt="" loading="lazy" aria-hidden
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: hover ? 1.02 : 1.1, opacity: hover ? 1 : 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ilkal-deep/55 via-transparent to-transparent pointer-events-none" />
+
+        {/* TL badges */}
+        <div className="absolute top-2 left-2 flex flex-col items-start gap-1 pointer-events-none">
+          {s.popular && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ilkal-gold/95 text-ilkal-deep text-[10px] font-bold shadow">
+              <Flame className="w-3 h-3" /> Popular
+            </span>
+          )}
+          {s.trending && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-ilkal-rose/95 text-white text-[10px] font-bold shadow">
+              <TrendingUp className="w-3 h-3" /> Trending
+            </span>
+          )}
+          {s.handloom && /^(yes|pure|s|handloom)/i.test(s.handloom) && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/95 text-ilkal-maroon text-[10px] font-semibold shadow">
+              Handloom
+            </span>
+          )}
+        </div>
+
+        {/* TR rating + like */}
+        <div className="absolute top-2 right-2 flex flex-col items-end gap-1.5">
+          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-white/95 text-[10px] font-semibold shadow">
             <Star className="w-3 h-3 fill-ilkal-gold text-ilkal-gold" />{s.rating}
           </span>
+          <button onClick={onLike}
+            aria-label="Save"
+            className={`w-8 h-8 rounded-full grid place-items-center shadow transition-all duration-300 ${
+              liked ? 'bg-ilkal-rose text-white scale-110' : 'bg-white/95 text-ilkal-maroon hover:scale-110'
+            }`}>
+            <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-white' : ''}`} />
+          </button>
         </div>
-        <span role="button" tabIndex={0}
-          onClick={(e) => { e.stopPropagation(); setLiked(l => !l); }}
-          className={`absolute bottom-10 right-2 w-8 h-8 rounded-full grid place-items-center shadow transition-all duration-300 ${
-            liked ? 'bg-ilkal-rose text-white scale-110' : 'bg-white/95 text-ilkal-maroon hover:scale-110'
-          }`}>
-          <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-white' : ''}`} />
-        </span>
-        <div className="absolute bottom-2 left-2 right-12 flex flex-wrap items-center gap-1 pointer-events-none">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur text-white text-[9px] sm:text-[10px] font-medium shadow">
-            <Camera className="w-3 h-3 shrink-0" /> {photoCount} live
-          </span>
-          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 border border-green-200 text-[8px] sm:text-[9px] font-semibold shadow">
-            Natural light
+
+        {/* BL — live capture badge */}
+        <div className="absolute bottom-2 left-2 flex items-center gap-1 pointer-events-none">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur text-white text-[10px] font-medium">
+            <Camera className="w-3 h-3" /> {photoCount}
           </span>
         </div>
-      </div>
-      <div className="p-3 flex flex-col flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="font-semibold text-ilkal-maroon text-sm line-clamp-1">{s.name}</h3>
-          <span className="shrink-0 text-[10px] font-bold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-1.5 py-0.5 rounded-full">
+
+        {/* BR — Saree ID highlight pill */}
+        <div className="absolute bottom-2 right-2 pointer-events-none">
+          <span className="inline-block text-[10px] font-bold text-ilkal-deep bg-ilkal-gold shadow px-2 py-0.5 rounded-full">
             {s.id}
           </span>
         </div>
-        <p className="text-[11px] opacity-70 line-clamp-1">{s.color} • {s.material || 'Ilkal weave'}</p>
-        <p className="text-[10px] italic opacity-70 mt-0.5 leading-snug">
-          📷 Slight colour variation possible due to natural lighting.
+      </div>
+
+      {/* INFO */}
+      <div className="p-3 sm:p-3.5 flex flex-col flex-1">
+        <h3 className="font-serif text-[15px] sm:text-base text-ilkal-maroon leading-tight line-clamp-1">
+          {s.name}
+        </h3>
+        <p className="text-[11px] opacity-70 mt-0.5 line-clamp-1">
+          {s.color}{s.material ? ` · ${s.material}` : ''}
         </p>
+
         <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
-          <span className="font-bold text-base text-ilkal-maroon">₹{s.price.toLocaleString('en-IN')}</span>
+          <span className="font-bold text-base sm:text-lg text-ilkal-maroon">
+            ₹{s.price.toLocaleString('en-IN')}
+          </span>
           {s.mrp > s.price && (
             <>
               <span className="text-[11px] line-through opacity-50">₹{s.mrp.toLocaleString('en-IN')}</span>
@@ -571,24 +597,29 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
             </>
           )}
         </div>
-        <div className="mt-3 space-y-2">
-          <button onClick={onOpen} className="btn-primary w-full text-sm py-2">
-            <Eye className="w-3.5 h-3.5" /> View Saree
-          </button>
+
+        {/* Action — single primary CTA */}
+        <div className="mt-2.5">
           {qty === 0 ? (
-            <button onClick={() => add(s)}
-              className="w-full text-sm py-2 rounded-full border border-ilkal-maroon text-ilkal-maroon font-semibold bg-white hover:bg-ilkal-cream transition inline-flex items-center justify-center gap-1.5">
-              <Plus className="w-3.5 h-3.5" /> Add
+            <button onClick={onAdd}
+              className="w-full text-[13px] py-2 rounded-full silk-gradient text-white font-semibold shadow-sm hover:shadow active:scale-[0.98] transition inline-flex items-center justify-center gap-1.5">
+              <Plus className="w-3.5 h-3.5" /> Add to bag
             </button>
           ) : (
             <div className="flex items-center justify-between bg-ilkal-cream rounded-full border border-ilkal-gold/40 p-0.5">
-              <button onClick={() => dec(s.id)} className="w-8 h-8 rounded-full bg-white shadow grid place-items-center text-ilkal-maroon active:scale-90"><Minus className="w-3.5 h-3.5" /></button>
-              <span className="font-bold text-ilkal-maroon text-sm">{qty} in bag</span>
-              <button onClick={() => inc(s.id)} disabled={qty >= 5} className="w-8 h-8 rounded-full bg-white shadow grid place-items-center text-ilkal-maroon active:scale-90 disabled:opacity-40"><Plus className="w-3.5 h-3.5" /></button>
+              <button onClick={onDec}
+                className="w-8 h-8 rounded-full bg-white shadow grid place-items-center text-ilkal-maroon active:scale-90">
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+              <span className="font-bold text-ilkal-maroon text-xs sm:text-sm">{qty} in bag</span>
+              <button onClick={onInc} disabled={qty >= 5}
+                className="w-8 h-8 rounded-full bg-white shadow grid place-items-center text-ilkal-maroon active:scale-90 disabled:opacity-40">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }

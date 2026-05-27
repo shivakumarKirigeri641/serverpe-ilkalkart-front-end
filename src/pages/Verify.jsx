@@ -7,6 +7,7 @@ import {
   ReceiptText, User, Calendar, Download,
 } from 'lucide-react';
 import { apiClient, uploadsUrl } from '../utils/api.js';
+import ScamWarning from '../components/ScamWarning.jsx';
 
 export default function Verify() {
   const { qrcode } = useParams();
@@ -67,6 +68,8 @@ export default function Verify() {
           )}
         </AnimatePresence>
       </div>
+
+      <ScamWarning />
     </div>
   );
 }
@@ -285,7 +288,13 @@ function GenuineCard({ data, qrcode, alreadyScanned, message }) {
               </li>
               <li className="flex items-start gap-2">
                 <Camera className="w-4 h-4 text-ilkal-maroon mt-0.5 shrink-0" />
-                Real photos & videos — no AI, no editing, no filters.
+                Real photos &amp; videos — no AI, no editing, no filters. Every frame carries an
+                <b> &quot;ilkalkart&quot; watermark</b> and a live capture timestamp.
+              </li>
+              <li className="flex items-start gap-2">
+                <BadgeCheck className="w-4 h-4 text-green-700 mt-0.5 shrink-0" />
+                All our SMS arrive only from the sender header
+                <span className="font-mono mx-1 px-1 py-0.5 rounded bg-ilkal-cream border border-ilkal-gold/30">*-SRVRPE-*</span>.
               </li>
             </ul>
           </div>

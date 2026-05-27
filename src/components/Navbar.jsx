@@ -26,7 +26,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 glass border-b border-ilkal-gold/30">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center gap-2">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center gap-1.5 sm:gap-2">
         {/* Mobile: hamburger menu */}
         <button
           className="md:hidden p-2 rounded-full bg-white shadow active:scale-95 transition shrink-0"

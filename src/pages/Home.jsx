@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, ShieldCheck, Plane, HeartHandshake, Star, Quote, PhoneCall, BellRing, Camera, QrCode, Gift, AlertTriangle, PackageCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { apiClient, uploadsUrl } from '../utils/api.js';
+import ScamWarning from '../components/ScamWarning.jsx';
 
 const SEED_TESTIMONIALS = [
   { id: 's1', n: 'Lakshmi, Bengaluru', t: 'I wore the Tope Teni for my pooja and got compliments all day. The fabric feels like a hug from my ajji.',           rating: 5 },
@@ -11,7 +12,7 @@ const SEED_TESTIMONIALS = [
   { id: 's3', n: 'Anitha, Hyderabad',  t: 'The Kasuti embroidery is unbelievable. Worth every rupee. Felt like a queen at my sister’s wedding.',                     rating: 5 }
 ];
 
-const TESTIMONIALS_PER_PAGE = 4;
+const TESTIMONIALS_PER_PAGE = 3;
 
 export default function Home() {
   const { sarees, heroMedia, offers = [] } = useCatalog();
@@ -58,7 +59,7 @@ export default function Home() {
   return (
     <div className="overflow-hidden">
       {/* HERO */}
-      <section className="relative h-[88vh] min-h-[560px] w-full">
+      <section className="relative h-[78vh] min-h-[520px] sm:h-[88vh] sm:min-h-[560px] w-full">
         {heroMedia.map((m, i) => (
           <motion.div key={i}
             className="absolute inset-0 bg-center bg-cover"
@@ -77,18 +78,18 @@ export default function Home() {
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/30 text-xs tracking-widest">
                 <Sparkles className="w-3.5 h-3.5 text-ilkal-gold" /> PURE • AUTHENTIC • GENUINE • ELEGANCE
               </span>
-              <h1 className="mt-4 font-serif text-4xl sm:text-6xl leading-tight">
+              <h1 className="mt-3 sm:mt-4 font-serif text-3xl sm:text-6xl leading-[1.1]">
                 Drape a piece of <span className="shimmer-text">Karnataka’s soul</span>
               </h1>
-              <p className="mt-4 text-base sm:text-lg opacity-95 max-w-xl">
+              <p className="mt-3 sm:mt-4 text-sm sm:text-lg opacity-95 max-w-xl">
                 Every Ilkal saree on this store is hand-picked in person from the looms of Ilkal village —
                 six centuries of weaving tradition, delivered to your doorstep with love and trust.
               </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link to="/browse" className="btn-primary">
-                  Start Browsing Sarees <ArrowRight className="w-4 h-4" />
+              <div className="mt-5 sm:mt-7 flex flex-wrap gap-2 sm:gap-3">
+                <Link to="/browse" className="btn-primary text-sm sm:text-base">
+                  Start Browsing <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link to="/about" className="btn-gold">Our Story</Link>
+                <Link to="/about" className="btn-gold text-sm sm:text-base">Our Story</Link>
               </div>
               <p className="mt-4 font-script text-2xl text-ilkal-gold drop-shadow">{heroMedia[slide]?.caption}</p>
               <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/35 backdrop-blur border border-ilkal-gold/40 text-[11px] sm:text-xs">
@@ -158,7 +159,7 @@ export default function Home() {
       </section>
 
       {/* WHY ILKAL — emotional */}
-      <section className="py-16 px-4 sm:px-6">
+      <section className="py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -238,6 +239,16 @@ export default function Home() {
             No account needed — just shop. Use the <b>Purchase History</b> tab anytime with the
             mobile number you placed the order from.
           </p>
+          <div className="mt-4 max-w-2xl mx-auto rounded-2xl bg-green-50 border border-green-200 px-4 py-3 flex items-start gap-2.5">
+            <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0 fill-green-600 mt-0.5"><path d="M20.52 3.48A11.86 11.86 0 0 0 12.02 0C5.4 0 .02 5.38.02 12c0 2.11.55 4.17 1.6 5.99L0 24l6.18-1.62A11.94 11.94 0 0 0 12.02 24c6.62 0 12-5.38 12-12 0-3.2-1.25-6.21-3.5-8.52ZM12.02 21.8a9.8 9.8 0 0 1-5-1.37l-.36-.22-3.66.96.98-3.57-.23-.37A9.79 9.79 0 1 1 21.82 12a9.78 9.78 0 0 1-9.8 9.8Z"/></svg>
+            <p className="text-xs sm:text-sm text-green-900 leading-relaxed text-left">
+              <b>Please share a WhatsApp-enabled mobile number at checkout.</b> I personally send live
+              <b> photos &amp; a short video</b> of your saree before packing, plus tracking updates — all on WhatsApp.
+              Every frame carries an <b>&quot;ilkalkart&quot;</b> watermark with a live timestamp, and
+              every OTP/SMS lands <b>only</b> from the sender header
+              <span className="font-mono mx-1 px-1.5 py-0.5 rounded bg-white border border-green-200">*-SRVRPE-*</span>.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -290,10 +301,10 @@ export default function Home() {
               <AlertTriangle className="w-6 h-6 text-ilkal-gold" />
             </div>
             <div>
-              <h3 className="font-serif text-xl text-ilkal-gold">A clear, honest no-return policy</h3>
+              <h3 className="font-serif text-xl text-ilkal-gold">A clear, honest no-return/replace policy</h3>
               <p className="text-sm opacity-90 mt-1 leading-relaxed">
                 Because every saree leaves my hands with complete photo and video proof of its clean, pristine
-                condition, we don’t offer returns or replacements. You buy with full confidence — exactly what
+                condition, I don’t offer returns or replacements. You buy with full confidence — exactly what
                 you approve on screen is what arrives at your doorstep. No saree is ever draped on a lady for
                 photos and none is ever worn before it reaches you — it is unfolded only to record the
                 non-damage proof, then folded and wrapped fresh.
@@ -307,7 +318,7 @@ export default function Home() {
       </section>
 
       {/* FEATURED PRODUCTS */}
-      <section className="bg-gradient-to-b from-white to-ilkal-cream py-16 px-4 sm:px-6">
+      <section className="bg-gradient-to-b from-white to-ilkal-cream py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -321,21 +332,31 @@ export default function Home() {
               View all <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 snap-x snap-mandatory">
-            {sarees.slice(0, 6).map(s => (
-              <Link key={s.id} to="/browse" className="snap-start shrink-0 w-60 sm:w-72 rounded-3xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img src={s.images[0]} alt={s.name} className="w-full h-full object-cover hover:scale-110 transition duration-700" />
+          <div className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 snap-x snap-mandatory
+                          [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {sarees.slice(0, 8).map(s => (
+              <Link key={s.id} to="/browse"
+                className="snap-start shrink-0 w-44 sm:w-60 lg:w-72 rounded-2xl sm:rounded-3xl overflow-hidden bg-white shadow-md hover:shadow-2xl transition group">
+                <div className="aspect-[3/4] overflow-hidden bg-ilkal-cream relative">
+                  <img src={s.images[0]} alt={s.name} loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                  <span className="absolute top-2 right-2 inline-block text-[10px] font-bold text-ilkal-deep bg-ilkal-gold shadow px-2 py-0.5 rounded-full">
+                    {s.id}
+                  </span>
                 </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-ilkal-maroon">{s.name}</h3>
-                    <span className="flex items-center gap-0.5 text-xs"><Star className="w-3.5 h-3.5 fill-ilkal-gold text-ilkal-gold" />{s.rating}</span>
+                <div className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-serif text-sm sm:text-base text-ilkal-maroon line-clamp-1">{s.name}</h3>
+                    <span className="flex items-center gap-0.5 text-[11px] shrink-0">
+                      <Star className="w-3 h-3 fill-ilkal-gold text-ilkal-gold" />{s.rating}
+                    </span>
                   </div>
-                  <p className="text-xs opacity-70">{s.color}</p>
-                  <div className="mt-2 flex items-baseline gap-2">
-                    <span className="font-bold text-ilkal-maroon">₹{s.price.toLocaleString('en-IN')}</span>
-                    <span className="text-xs line-through opacity-50">₹{s.mrp.toLocaleString('en-IN')}</span>
+                  <p className="text-[11px] opacity-70 line-clamp-1">{s.color}</p>
+                  <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
+                    <span className="font-bold text-ilkal-maroon text-sm sm:text-base">₹{s.price.toLocaleString('en-IN')}</span>
+                    {s.mrp > s.price && (
+                      <span className="text-[11px] line-through opacity-50">₹{s.mrp.toLocaleString('en-IN')}</span>
+                    )}
                   </div>
                 </div>
               </Link>
@@ -363,7 +384,7 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-16 px-4 sm:px-6">
+      <section className="py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-end justify-between flex-wrap gap-3">
             <h2 className="font-serif text-3xl sm:text-4xl text-ilkal-maroon">What our beauties say?</h2>
@@ -384,7 +405,7 @@ export default function Home() {
                     (p + 1) * TESTIMONIALS_PER_PAGE,
                   );
                   return (
-                    <div key={p} className="shrink-0 w-full grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                    <div key={p} className="shrink-0 w-full grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {slice.map((r, i) => (
                         <div key={r.id || i}
                           className="bg-white rounded-3xl p-5 shadow-lg border border-ilkal-gold/20">
@@ -441,7 +462,7 @@ export default function Home() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="relative py-20 px-4 sm:px-6 overflow-hidden">
+      <section className="relative py-14 sm:py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 silk-gradient" />
         <div className="absolute inset-0 bg-cover bg-center opacity-25"
           style={{ backgroundImage: sarees[1] ? `url(${sarees[1].images[0]})` : 'none' }} />
@@ -467,6 +488,9 @@ export default function Home() {
           </p>
         </motion.div>
       </section>
+
+      {/* BEWARE OF SCAMS — placed at the very end so it sticks in memory */}
+      <ScamWarning />
     </div>
   );
 }

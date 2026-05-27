@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Package, MapPin, Phone, Mail, Sparkles, Download, FileText, Camera, MessageCircle, Copy, Truck } from 'lucide-react';
+import { CheckCircle2, Package, MapPin, Phone, Mail, Sparkles, Download, FileText, Camera, MessageCircle, Copy, Truck, AlertTriangle } from 'lucide-react';
 import logo from '../images/logo/ilkalKart_logo.png';
 import { downloadInvoice } from '../utils/invoice.js';
 import { uploadsUrl } from '../utils/api.js';
@@ -257,6 +257,32 @@ export default function Confirmation() {
             </ul>
             <p className="mt-3 text-[11px] italic opacity-80">
               📷 Disclaimer: A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-3xl border-2 border-red-200 bg-red-50 p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-red-600 grid place-items-center shrink-0 text-white shadow">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div className="text-sm leading-relaxed">
+            <h3 className="font-serif text-lg text-red-800">After-order scam alerts — please read</h3>
+            <p className="mt-1 text-red-900/90">
+              Fraudsters often target customers right after a real purchase. Please keep these in mind for the next few days:
+            </p>
+            <ul className="mt-2 space-y-1.5 text-[13px] text-red-900/90">
+              <li>🚩 <b>We will never call you</b> asking for an OTP, UPI PIN, or to install any app (AnyDesk, TeamViewer, etc.). Hang up immediately.</li>
+              <li>🚩 No <b>&quot;customs&quot;, &quot;delivery hold&quot;, or &quot;COD top-up&quot; fee</b> — your total here is final. Anyone asking for extra money is a scammer.</li>
+              <li>🚩 Tracking &amp; saree photos come <b>only on WhatsApp from +91 {user.mobile_number}&apos;s registered founder number</b>. Verify the contact name before clicking links.</li>
+              <li>🚩 Refund / cancellation links arriving by SMS are <b>almost always phishing</b>. Use this site&apos;s Track page or Contact us directly.</li>
+              <li>✅ <b>All our SMS</b> (order, dispatch, delivery, refund) arrive <b>only</b> from the header <span className="font-mono px-1.5 py-0.5 rounded bg-white border border-red-200">*-SRVRPE-*</span>. Lookalikes such as &quot;ILKAL&quot;, &quot;IKART&quot;, &quot;ILKLKT&quot; are spoofs — ignore them.</li>
+              <li>✅ <b>Every photo &amp; video</b> we send carries an <b>&quot;ilkalkart&quot;</b> watermark and a live capture timestamp. If a saree photo without those marks lands on your phone claiming to be from us, it&apos;s not.</li>
+            </ul>
+            <p className="mt-2 text-[12px] text-red-900/90">
+              If anything feels off, message us through the <Link to="/contact" className="underline font-semibold">Contact page</Link>.
+              If you&apos;ve been targeted, report at <a href="https://cybercrime.gov.in" target="_blank" rel="noreferrer" className="underline font-semibold">cybercrime.gov.in</a> or dial <b>1930</b>.
             </p>
           </div>
         </div>

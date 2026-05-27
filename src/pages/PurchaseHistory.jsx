@@ -5,6 +5,7 @@ import {
   Calendar, ChevronDown, CheckCircle2, IndianRupee, CreditCard, Download,
 } from 'lucide-react';
 import { apiClient, uploadsUrl } from '../utils/api.js';
+import ScamWarning from '../components/ScamWarning.jsx';
 
 export default function PurchaseHistory() {
   const [mobile, setMobile] = useState('');
@@ -69,6 +70,13 @@ export default function PurchaseHistory() {
       <p className="mt-2 text-center text-[11px] opacity-60">
         Only the registered mobile number used during purchase can fetch its history. Requests are rate-limited.
       </p>
+      <p className="mt-2 text-center text-[11px] text-green-800 max-w-md mx-auto">
+        💚 Tip: share your <b>WhatsApp number</b> at checkout — I send photos &amp; videos of your saree there.
+      </p>
+      <p className="mt-1 text-center text-[11px] opacity-75 max-w-md mx-auto">
+        ✅ Our SMS arrive only from <b className="font-mono">*-SRVRPE-*</b>; every saree photo/video carries an
+        <b> &quot;ilkalkart&quot;</b> watermark + timestamp.
+      </p>
 
       {error && (
         <motion.div
@@ -116,6 +124,10 @@ export default function PurchaseHistory() {
           )}
         </motion.div>
       )}
+
+      <div className="-mx-4 sm:-mx-6 mt-10">
+        <ScamWarning compact />
+      </div>
     </div>
   );
 }

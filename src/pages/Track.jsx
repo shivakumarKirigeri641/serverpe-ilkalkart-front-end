@@ -56,6 +56,16 @@ export default function Track() {
       <p className="text-center opacity-70 mt-2">
         Enter your Order ID to follow your saree&apos;s journey.
       </p>
+      <p className="text-center text-[11px] text-green-800 mt-1.5">
+        💚 You&apos;ll also receive live tracking, photos &amp; a packing video on the <b>WhatsApp number</b> you used at checkout.
+      </p>
+      <p className="text-center text-[11px] text-red-800 mt-1 max-w-md mx-auto">
+        🛡️ <b>Beware:</b> we never SMS or call asking for OTPs, extra delivery fees, or app installs. Check tracking only here.
+      </p>
+      <p className="text-center text-[11px] opacity-80 mt-1 max-w-md mx-auto">
+        ✅ Our SMS arrive only from <b className="font-mono">*-SRVRPE-*</b>. Every saree photo/video we send carries an
+        <b> &quot;ilkalkart&quot;</b> watermark + live timestamp.
+      </p>
 
       <form onSubmit={track} className="mt-6 flex gap-2 max-w-md mx-auto">
         <input value={oid} onChange={e => setOid(e.target.value)}
