@@ -56,6 +56,7 @@ export default function Verify() {
           <p className="mt-2 text-sm opacity-70">
             Scanning the QR tag printed on your saree label.
           </p>
+
         </div>
 
         <AnimatePresence mode="wait">
@@ -92,14 +93,16 @@ function LoadingCard({ qrcode }) {
 }
 
 function GenuineCard({ data, qrcode, alreadyScanned, message }) {
+  const last4 = data?.buyer?.mobile_last4 || null;
   const accent = alreadyScanned
     ? {
         border: 'border-amber-300',
         gradient: 'from-amber-600 via-orange-500 to-amber-600',
         iconColor: 'text-amber-600',
         halo: 'bg-amber-500/40',
-        title: 'Already Verified',
-        subtitle: 'This QR has been scanned and verified before.',
+        title: 'Verification already done',
+        subtitle:
+          'This saree has already been verified once. Repeat scans are normal — but the first scan was recorded at delivery.',
       }
     : {
         border: 'border-green-300',
@@ -149,25 +152,40 @@ function GenuineCard({ data, qrcode, alreadyScanned, message }) {
         </div>
 
         <div className="p-6 space-y-4">
+          {/* Buyer mobile last-4 — prominent confirmation */}
+          {last4 && (
+            <div className="rounded-2xl border-2 border-ilkal-gold/40 bg-ilkal-cream/60 p-4 text-center">
+              <div className="text-[10px] uppercase tracking-widest text-ilkal-maroon/70 font-semibold">
+                Registered to purchaser
+              </div>
+              <div className="mt-1 font-serif text-xl sm:text-2xl text-ilkal-maroon">
+                +91 ✱✱✱✱✱✱ <span className="font-mono tracking-widest">{last4}</span>
+              </div>
+              <p className="mt-1 text-[11px] sm:text-xs text-ilkal-deep/75">
+                If the last 4 digits match the mobile number you used at purchase, this saree is truly yours.
+                If not, please <Link to="/contact" className="underline font-semibold text-ilkal-maroon">contact us</Link> immediately.
+              </p>
+            </div>
+          )}
+
           {alreadyScanned ? (
             <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed">
               <h3 className="font-semibold text-amber-900 flex items-center gap-1.5">
-                <ShieldAlert className="w-4 h-4" /> This label has already been opened
+                <ShieldAlert className="w-4 h-4" /> Saree verification is already done
               </h3>
               <p className="mt-1 text-amber-900/90">
                 {message ||
-                  'This QR was first verified at delivery. If this is your first time scanning it, the saree may have been re-packed or the label re-used — please contact us right away.'}
+                  'This QR was verified earlier. The saree is genuine; you&apos;re simply seeing the verification record again.'}
               </p>
               <div className="mt-2 text-[12px] text-amber-900/80">
-                Genuine purchases are verified <b>once</b> when the customer opens the package. Repeat scans on the
-                same code from the same device are normal; first-time scans of a previously-used code are not.
+                Each saree only needs to be verified <b>once</b>. Repeat scans are fine — they don&apos;t change anything.
               </div>
             </div>
           ) : (
             <p className="text-center text-sm leading-relaxed text-ilkal-deep">
               Thank you for trusting Ilkal Kart. Your saree has been verified against our records and is
               confirmed as a <b className="text-green-700">genuine, original</b> piece — not a replica.
-              This QR is now marked as <b>opened</b> and will be flagged on any future first-time scan.
+              This QR is now marked as <b>verified</b>; future scans will simply show this same confirmation.
             </p>
           )}
 
