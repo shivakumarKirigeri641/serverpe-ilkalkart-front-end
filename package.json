@@ -1,0 +1,50 @@
+{
+  "name": "ilkal-kart",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.51.23",
+    "axios": "^1.7.4",
+    "framer-motion": "^11.3.19",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.408.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.52.1",
+    "react-hot-toast": "^2.4.1",
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.26.0",
+    "react-scripts": "5.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.40",
+    "tailwindcss": "^3.4.7"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  }
+}
