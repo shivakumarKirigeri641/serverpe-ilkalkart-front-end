@@ -262,6 +262,30 @@ export default function Confirmation() {
         </div>
       </div>
 
+      <div className="mt-6 rounded-3xl border-2 border-ilkal-gold/40 bg-gradient-to-br from-ilkal-cream via-white to-ilkal-cream p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-ilkal-maroon grid place-items-center shrink-0 text-white shadow">
+            <Camera className="w-5 h-5" />
+          </div>
+          <div className="text-sm leading-relaxed">
+            <h3 className="font-serif text-lg text-ilkal-maroon">🎥 Please record an unboxing video</h3>
+            <p className="mt-1 text-ilkal-deep/90">
+              When the parcel arrives, kindly <b>record a single continuous unboxing video</b> — from the sealed packet
+              right up to the saree being unfolded. It&apos;s a small step that protects <b>both of us</b>:
+            </p>
+            <ul className="mt-2 space-y-1 text-[13px] text-ilkal-deep/90">
+              <li>✅ Proof for <b>you</b> if the courier hands over a damaged or tampered parcel.</li>
+              <li>✅ Proof for <b>me</b> that the saree left my hands in perfect condition.</li>
+              <li>✅ Required for any courier-damage claim or replacement request.</li>
+            </ul>
+            <p className="mt-2 text-[12px] text-ilkal-deep/80">
+              💡 Tip: start recording <b>before</b> opening the seal, keep it in one shot, and share it on
+              WhatsApp <b>+91 {user.mobile_number}</b>.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="mt-6 rounded-3xl border-2 border-red-200 bg-red-50 p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <div className="w-11 h-11 rounded-2xl bg-red-600 grid place-items-center shrink-0 text-white shadow">

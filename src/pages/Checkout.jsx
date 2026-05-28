@@ -178,7 +178,7 @@ export default function Checkout() {
   };
 
   const verifyOtp = async () => {
-    if (!/^\d{4,6}$/.test(otp)) { toast.error('Enter the OTP sent to your mobile'); return; }
+    if (!/^\d{4}$/.test(otp)) { toast.error('Enter the 4-digit OTP sent to your mobile'); return; }
     if (!valid) { setShowErrors(true); toast.error('Please complete the highlighted fields'); return; }
     setVerifyingOtp(true);
     try {
@@ -461,7 +461,7 @@ export default function Checkout() {
                       <div className="flex items-center gap-1.5 min-w-0">
                         <h3 className="font-semibold text-ilkal-maroon truncate">{it.name}</h3>
                         <span className="shrink-0 text-[10px] font-bold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-1.5 py-0.5 rounded-full">
-                          {it.id}
+                          ID:{it.id}
                         </span>
                       </div>
                       <dl className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] leading-tight">
@@ -612,11 +612,9 @@ export default function Checkout() {
           <Row label="Total Payable" value={`₹${total.toLocaleString('en-IN')}`} bold />
           <p className="mt-2 text-xs opacity-70">All prices are inclusive of GST. You won’t be charged anything extra.</p>
 
-          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-[11px] leading-relaxed text-red-900">
-            <b>🛡️ Beware of scams:</b> we <u>never</u> ask for UPI transfers to personal numbers, OTPs over the phone,
-            or extra &quot;customs/COD&quot; fees after checkout. Pay <b>only</b> through the secure gateway button below —
-            anything else claiming to be Ilkal Kart is fake.
-          </div>
+          <p className="mt-3 text-[11px] text-red-800 leading-snug">
+            🛡️ Pay only via the secure button below. We never ask for UPI to personal numbers or extra fees.
+          </p>
 
           <div className="mt-5">
             {!otpVerified ? (
@@ -629,10 +627,8 @@ export default function Checkout() {
                   <p className="mt-1 text-[11px] opacity-70 leading-snug">
                     We&apos;ll send a 4-digit OTP to <b>{contact.mobile || '— —'}</b> to confirm your order.
                   </p>
-                  <p className="mt-1.5 text-[11px] leading-snug text-green-900 bg-green-50 border border-green-200 rounded-lg px-2 py-1.5">
-                    <b>🔒 Sender ID check:</b> our SMS arrives <b>only</b> from the header
-                    <span className="font-mono mx-1">*-SRVRPE-*</span> (e.g. <span className="font-mono">VM-SRVRPE</span>, <span className="font-mono">JD-SRVRPE</span>).
-                    Any OTP &quot;from Ilkal Kart&quot; on a different header is fake — <b>do not share it</b>.
+                  <p className="mt-1 text-[11px] text-green-900 leading-snug">
+                    🔒 SMS only from <span className="font-mono">*-SRVRPE-*</span>.
                   </p>
                 </div>
 
@@ -659,7 +655,7 @@ export default function Checkout() {
                         inputMode="numeric"
                         maxLength={4}
                         value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && otp.length === 4 && !verifyingOtp) {
                             e.preventDefault();
@@ -688,9 +684,7 @@ export default function Checkout() {
                       </button>
                     </div>
                     <p className="text-[11px] text-red-800 leading-snug">
-                      🚨 The OTP SMS appears <b>only</b> from the sender header
-                      <span className="font-mono mx-1">*-SRVRPE-*</span>. Ignore lookalikes like &quot;ILKAL&quot;,
-                      &quot;IKART&quot;, etc. We will <b>never</b> ask you to share this OTP on a call.
+                      🚨 OTP only from <span className="font-mono">*-SRVRPE-*</span>. Never share on a call.
                     </p>
                   </div>
                 )}
@@ -718,14 +712,9 @@ export default function Checkout() {
                 onChange={(e) => { setAgreedTerms(e.target.checked); if (e.target.checked) setShowTermsError(false); }}
                 className="mt-0.5 w-4 h-4 shrink-0 accent-ilkal-maroon cursor-pointer"
               />
-              <span className="text-[12px] leading-relaxed text-ilkal-deep">
-                I have read &amp; agreed to the <b className="text-ilkal-maroon">Terms &amp; Conditions</b>, the
-                <b className="text-ilkal-maroon"> no-return / no-replacement policy</b>, and accept that I will
-                receive exactly what is shown in the live photos &amp; videos. I understand a slight colour
-                variation is possible due to natural lighting; that all genuine SMS will arrive only from the sender
-                header <span className="font-mono">*-SRVRPE-*</span> and that every photo/video I receive will carry
-                an <b>&quot;ilkalkart&quot;</b> watermark with a live timestamp; and that all my <b>liabilities</b>{' '}
-                after successful payment are limited to what is described in the policy.
+              <span className="text-[11px] leading-snug text-ilkal-deep">
+                I agree to the <b className="text-ilkal-maroon">Terms</b>, the{' '}
+                <b className="text-ilkal-maroon">no-return policy</b> and accept all liabilities thereof.
               </span>
             </label>
             {showTermsError && !agreedTerms && (

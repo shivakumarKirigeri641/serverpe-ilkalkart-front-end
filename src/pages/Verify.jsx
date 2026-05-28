@@ -182,11 +182,23 @@ function GenuineCard({ data, qrcode, alreadyScanned, message }) {
               </div>
             </div>
           ) : (
-            <p className="text-center text-sm leading-relaxed text-ilkal-deep">
-              Thank you for trusting Ilkal Kart. Your saree has been verified against our records and is
-              confirmed as a <b className="text-green-700">genuine, original</b> piece — not a replica.
-              This QR is now marked as <b>verified</b>; future scans will simply show this same confirmation.
-            </p>
+            <>
+              <p className="text-center text-sm leading-relaxed text-ilkal-deep">
+                Thank you for trusting Ilkal Kart. Your saree has been verified against our records and is
+                confirmed as a <b className="text-green-700">genuine, original</b> piece — not a replica.
+                This QR is now marked as <b>verified</b>; future scans will simply show this same confirmation.
+              </p>
+              <div className="rounded-2xl border-2 border-ilkal-gold/40 bg-ilkal-cream/70 p-4 text-sm leading-relaxed">
+                <h3 className="font-semibold text-ilkal-maroon flex items-center gap-1.5">
+                  <Camera className="w-4 h-4 text-ilkal-maroon" /> 🎥 Please record an unboxing video
+                </h3>
+                <p className="mt-1 text-[13px] text-ilkal-deep/90">
+                  A short continuous video from the sealed packet to the unfolded saree protects
+                  <b> both of us</b> — your proof if anything is wrong, and mine that the saree left in
+                  perfect condition. Share it on WhatsApp.
+                </p>
+              </div>
+            </>
           )}
 
           {data?.saree && (

@@ -66,6 +66,9 @@ export default function Track() {
         ✅ Our SMS arrive only from <b className="font-mono">*-SRVRPE-*</b>. Every saree photo/video we send carries an
         <b> &quot;ilkalkart&quot;</b> watermark + live timestamp.
       </p>
+      <p className="text-center text-[11px] text-ilkal-maroon mt-1 max-w-md mx-auto">
+        🎥 <b>When the parcel arrives,</b> please record a continuous unboxing video — protects both you &amp; me.
+      </p>
 
       <form onSubmit={track} className="mt-6 flex gap-2 max-w-md mx-auto">
         <input value={oid} onChange={e => setOid(e.target.value)}

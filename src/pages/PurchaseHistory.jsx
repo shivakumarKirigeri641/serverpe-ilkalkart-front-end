@@ -3,43 +3,89 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package, Phone, Loader2, AlertCircle, ShoppingBag, Truck, ReceiptText,
   Calendar, ChevronDown, CheckCircle2, IndianRupee, CreditCard, Download,
+  MessageSquare, KeyRound, ArrowLeft,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { apiClient, uploadsUrl } from '../utils/api.js';
 import ScamWarning from '../components/ScamWarning.jsx';
 
 export default function PurchaseHistory() {
+  const [step, setStep] = useState('mobile'); // 'mobile' | 'otp' | 'result'
   const [mobile, setMobile] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState(null);
+  const [info, setInfo] = useState(null);
   const [result, setResult] = useState(null);
   const [openId, setOpenId] = useState(null);
 
-  const isValid = /^[6-9]\d{9}$/.test(mobile.trim());
+  const isValidMobile = /^[6-9]\d{9}$/.test(mobile.trim());
+  const isValidOtp = /^\d{4}$/.test(otp.trim());
 
-  const fetchHistory = async (e) => {
+  const sendOtp = async (e) => {
     e?.preventDefault?.();
-    if (!isValid) {
+    if (!isValidMobile) {
       setError('Please enter a valid 10-digit Indian mobile number.');
       return;
     }
-    setLoading(true);
+    setSending(true);
     setError(null);
-    setResult(null);
-    setOpenId(null);
+    setInfo(null);
     try {
-      const res = await apiClient.post('/purchase-history', { mobile_number: mobile.trim() });
+      const res = await apiClient.post('/purchase-history/send-otp', { mobile_number: mobile.trim() });
       const body = res.data;
       if (!body?.successstatus) {
-        setError(body?.message || 'Could not fetch purchase history.');
+        setError(body?.message || 'Could not send OTP. Please try again.');
+        return;
+      }
+      setInfo(body.message || 'OTP sent.');
+      setStep('otp');
+      toast.success('OTP sent');
+    } catch (e) {
+      setError(e?.message || 'Could not send OTP. Please try again.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const verifyOtp = async (e) => {
+    e?.preventDefault?.();
+    if (!isValidOtp) {
+      setError('Please enter the OTP sent to your mobile.');
+      return;
+    }
+    setVerifying(true);
+    setError(null);
+    try {
+      const res = await apiClient.post('/purchase-history/verify-otp', {
+        mobile_number: mobile.trim(),
+        otp: otp.trim(),
+      });
+      const body = res.data;
+      if (!body?.successstatus) {
+        setError(body?.message || 'OTP verification failed.');
         return;
       }
       setResult(body.data);
+      setStep('result');
       if (body.data?.orders?.length === 1) setOpenId(body.data.orders[0].order_id);
+      toast.success('Verified');
     } catch (e) {
-      setError(e?.message || 'Could not fetch purchase history.');
+      setError(e?.message || 'OTP verification failed.');
     } finally {
-      setLoading(false);
+      setVerifying(false);
     }
+  };
+
+  const restart = () => {
+    setStep('mobile');
+    setMobile('');
+    setOtp('');
+    setError(null);
+    setInfo(null);
+    setResult(null);
+    setOpenId(null);
   };
 
   const orders = result?.orders || [];
@@ -48,46 +94,105 @@ export default function PurchaseHistory() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="font-serif text-3xl sm:text-4xl text-ilkal-maroon text-center">Purchase History</h1>
       <p className="text-center opacity-70 mt-2">
-        Enter the mobile number you used to place the order. We&apos;ll show all your past purchases.
+        Verify your mobile number with a one-time password to view your past orders.
       </p>
 
-      <form onSubmit={fetchHistory} className="mt-6 flex gap-2 max-w-md mx-auto">
-        <div className="relative flex-1">
-          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ilkal-maroon" />
-          <input
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value.replace(/[^\d]/g, '').slice(0, 10))}
-            placeholder="10-digit mobile number"
-            inputMode="numeric"
-            className="w-full pl-10 pr-4 py-3 rounded-full bg-white border border-ilkal-gold/30 focus:outline-none focus:border-ilkal-maroon shadow-sm"
-          />
-        </div>
-        <button className="btn-primary" disabled={loading || !isValid}>
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify & Fetch'}
-        </button>
-      </form>
+      {step === 'mobile' && (
+        <form onSubmit={sendOtp} className="mt-6 flex gap-2 max-w-md mx-auto">
+          <div className="relative flex-1">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ilkal-maroon" />
+            <input
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value.replace(/[^\d]/g, '').slice(0, 10))}
+              placeholder="10-digit mobile number"
+              inputMode="numeric"
+              autoFocus
+              className="w-full pl-10 pr-4 py-3 rounded-full bg-white border border-ilkal-gold/30 focus:outline-none focus:border-ilkal-maroon shadow-sm"
+            />
+          </div>
+          <button className="btn-primary" disabled={sending || !isValidMobile}>
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><MessageSquare className="w-4 h-4" /> Send OTP</>}
+          </button>
+        </form>
+      )}
 
-      <p className="mt-2 text-center text-[11px] opacity-60">
-        Only the registered mobile number used during purchase can fetch its history. Requests are rate-limited.
-      </p>
-      <p className="mt-2 text-center text-[11px] text-green-800 max-w-md mx-auto">
-        💚 Tip: share your <b>WhatsApp number</b> at checkout — I send photos &amp; videos of your saree there.
-      </p>
-      <p className="mt-1 text-center text-[11px] opacity-75 max-w-md mx-auto">
-        ✅ Our SMS arrive only from <b className="font-mono">*-SRVRPE-*</b>; every saree photo/video carries an
-        <b> &quot;ilkalkart&quot;</b> watermark + timestamp.
-      </p>
+      {step === 'otp' && (
+        <form onSubmit={verifyOtp} className="mt-6 max-w-md mx-auto space-y-3">
+          <div className="rounded-2xl border border-ilkal-gold/30 bg-ilkal-cream/60 p-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-ilkal-maroon">
+              <KeyRound className="w-4 h-4" />
+              <span>Enter the OTP sent to <b>+91 {mobile}</b></span>
+            </div>
+            <p className="mt-1 text-[11px] text-green-900 leading-snug">
+              🔒 SMS only from <span className="font-mono">*-SRVRPE-*</span>. Valid for 3 minutes. Never share over a call.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <input
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/[^\d]/g, '').slice(0, 4))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && isValidOtp && !verifying) {
+                    e.preventDefault();
+                    verifyOtp();
+                  }
+                }}
+                placeholder="• • • •"
+                inputMode="numeric"
+                maxLength={4}
+                autoFocus
+                className="flex-1 h-11 px-3 rounded-xl bg-white border border-ilkal-gold/40 focus:border-ilkal-maroon focus:outline-none text-center tracking-[0.5em] font-bold text-ilkal-maroon"
+              />
+              <button
+                type="submit"
+                disabled={!isValidOtp || verifying}
+                className="h-11 px-5 rounded-xl silk-gradient text-white font-semibold text-sm shadow shrink-0 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-1.5">
+                {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
+              </button>
+            </div>
+            <div className="mt-2 flex items-center justify-between text-[11px]">
+              <button
+                type="button"
+                onClick={restart}
+                className="inline-flex items-center gap-1 text-ilkal-maroon font-semibold">
+                <ArrowLeft className="w-3 h-3" /> Change number
+              </button>
+              <button
+                type="button"
+                onClick={sendOtp}
+                disabled={sending}
+                className="text-ilkal-maroon font-semibold underline disabled:opacity-50">
+                Resend OTP
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
+      {step === 'mobile' && (
+        <p className="mt-2 text-center text-[11px] opacity-60">
+          Only the registered mobile number used during purchase can fetch its history. Requests are rate-limited.
+        </p>
+      )}
+
+      {info && step === 'otp' && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          className="mt-3 max-w-md mx-auto rounded-2xl border border-green-200 bg-green-50 px-3 py-2 flex items-start gap-2">
+          <CheckCircle2 className="w-4 h-4 text-green-700 mt-0.5 shrink-0" />
+          <div className="text-xs text-green-800">{info}</div>
+        </motion.div>
+      )}
 
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="mt-8 max-w-md mx-auto rounded-2xl border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+          className="mt-4 max-w-md mx-auto rounded-2xl border border-red-200 bg-red-50 p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
           <div className="text-sm text-red-800">{error}</div>
         </motion.div>
       )}
 
-      {result && (
+      {step === 'result' && result && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-10 space-y-3">
           <div className="bg-white rounded-2xl border border-ilkal-gold/20 p-4 shadow-sm flex items-center gap-3">
             <div className="w-10 h-10 rounded-full silk-gradient grid place-items-center text-white font-bold">
@@ -99,8 +204,16 @@ export default function PurchaseHistory() {
                 {result?.user?.user_name || 'Customer'} • +91 {result?.user?.mobile_number}
               </div>
             </div>
-            <div className="ml-auto shrink-0 text-xs font-semibold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-2.5 py-1 rounded-full">
-              {orders.length} order{orders.length === 1 ? '' : 's'}
+            <div className="ml-auto shrink-0 flex items-center gap-2">
+              <div className="text-xs font-semibold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-2.5 py-1 rounded-full">
+                {orders.length} order{orders.length === 1 ? '' : 's'}
+              </div>
+              <button
+                type="button"
+                onClick={restart}
+                className="text-[11px] text-ilkal-maroon font-semibold underline">
+                Sign out
+              </button>
             </div>
           </div>
 

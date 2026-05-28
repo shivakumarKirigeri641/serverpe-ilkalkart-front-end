@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles, ShieldCheck, Plane, HeartHandshake, Star, Quote, 
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { apiClient, uploadsUrl } from '../utils/api.js';
 import ScamWarning from '../components/ScamWarning.jsx';
+import WhatsAppOrderCard from '../components/WhatsAppOrderCard.jsx';
 
 const SEED_TESTIMONIALS = [
   { id: 's1', n: 'Lakshmi, Bengaluru', t: 'I wore the Tope Teni for my pooja and got compliments all day. The fabric feels like a hug from my ajji.',           rating: 5 },
@@ -341,7 +342,7 @@ export default function Home() {
                   <img src={s.images[0]} alt={s.name} loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
                   <span className="absolute top-2 right-2 inline-block text-[10px] font-bold text-ilkal-deep bg-ilkal-gold shadow px-2 py-0.5 rounded-full">
-                    {s.id}
+                    ID:{s.id}
                   </span>
                 </div>
                 <div className="p-3 sm:p-4">
@@ -488,6 +489,9 @@ export default function Home() {
           </p>
         </motion.div>
       </section>
+
+      {/* ORDER ON WHATSAPP — alternative checkout for women who prefer chatting */}
+      <WhatsAppOrderCard />
 
       {/* BEWARE OF SCAMS — placed at the very end so it sticks in memory */}
       <ScamWarning />

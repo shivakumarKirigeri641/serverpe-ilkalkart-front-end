@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { apiClient } from '../utils/api.js';
 import ScamWarning from '../components/ScamWarning.jsx';
+import WhatsAppOrderCard from '../components/WhatsAppOrderCard.jsx';
 
 export default function Contact() {
   const { queryTypes } = useCatalog();
@@ -115,6 +116,7 @@ export default function Contact() {
         .input:focus { border-color:#7B1E3A; }
       `}</style>
 
+      <WhatsAppOrderCard />
       <ScamWarning />
     </div>
   );

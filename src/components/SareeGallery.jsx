@@ -228,7 +228,7 @@ export default function SareeGallery({ saree, onClose }) {
                 </h2>
                 <p className="text-sm opacity-70 mt-0.5">{saree.color}</p>
                 <span className="inline-block mt-1.5 text-[11px] font-bold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-2 py-0.5 rounded-full">
-                  {saree.id}
+                  ID:{saree.id}
                 </span>
               </div>
               {saree.handloom && /^(yes|pure|s|handloom)/i.test(saree.handloom) && (

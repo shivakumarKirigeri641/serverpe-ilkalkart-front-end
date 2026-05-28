@@ -5,6 +5,7 @@ import {
   Users, HeartHandshake, Camera, BadgePercent, CheckCircle2, PhoneCall
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
+import WhatsAppOrderCard from '../components/WhatsAppOrderCard.jsx';
 
 export default function Bulk() {
   const { count, bulkMinQty, bulkDiscountRate, bulkEligible, subtotal, bulkDiscount } = useCart();
@@ -183,6 +184,8 @@ export default function Bulk() {
           </div>
         </div>
       </section>
+
+      <WhatsAppOrderCard />
     </div>
   );
 }

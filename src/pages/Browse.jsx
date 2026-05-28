@@ -10,6 +10,7 @@ import {
 import { useCatalog } from '../context/CatalogContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import SareeGallery from '../components/SareeGallery.jsx';
+import WhatsAppOrderCard from '../components/WhatsAppOrderCard.jsx';
 
 const RATINGS = [4.5, 4.0];
 const SORTS = [
@@ -231,6 +232,11 @@ export default function Browse() {
             </li>
           ))}
         </ol>
+      </div>
+
+      {/* WhatsApp alternative — for sisters who prefer chatting */}
+      <div className="mb-4">
+        <WhatsAppOrderCard variant="inline" />
       </div>
 
       {/* Header / search */}
@@ -572,7 +578,7 @@ function SareeCard({ s, index, qty, add, inc, dec, onOpen }) {
         {/* BR — Saree ID highlight pill */}
         <div className="absolute bottom-2 right-2 pointer-events-none">
           <span className="inline-block text-[10px] font-bold text-ilkal-deep bg-ilkal-gold shadow px-2 py-0.5 rounded-full">
-            {s.id}
+            ID:{s.id}
           </span>
         </div>
       </div>
