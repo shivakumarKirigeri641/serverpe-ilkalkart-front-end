@@ -17,10 +17,10 @@ import Verify from './pages/Verify.jsx';
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-ilkal-cream">
+    <div className="min-h-screen flex flex-col bg-stone-50">
       <ScrollToTop />
       <Navbar />
-      <main className="flex-1 pt-16 pb-20 md:pb-0">
+      <main className="flex-1 pt-16 md:pt-20 pb-20 md:pb-0">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Browse />} />

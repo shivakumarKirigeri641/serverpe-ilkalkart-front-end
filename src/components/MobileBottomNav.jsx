@@ -14,7 +14,7 @@ export default function MobileBottomNav() {
   const { count } = useCart();
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-ilkal-gold/30 shadow-[0_-4px_20px_rgba(123,30,58,0.08)]"
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-stone-200"
          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <ul className="grid grid-cols-5 max-w-md mx-auto">
         {items.map((it) => {
@@ -23,18 +23,18 @@ export default function MobileBottomNav() {
             <li key={it.label}>
               <NavLink to={it.to} end={it.to === '/'}
                 className={({ isActive }) =>
-                  `relative flex flex-col items-center justify-center py-2 gap-0.5 transition ${
-                    isActive ? 'text-ilkal-maroon' : 'text-ilkal-deep/70'
+                  `relative flex flex-col items-center justify-center py-2 gap-1 transition-colors ${
+                    isActive ? 'text-stone-900' : 'text-stone-400'
                   }`
                 }>
                 {({ isActive }) => (
                   <>
-                    <span className={`relative w-10 h-10 grid place-items-center rounded-full transition-all duration-300 ${
-                      isActive ? 'silk-gradient text-white shadow-md scale-105' : ''
+                    <span className={`relative w-10 h-10 grid place-items-center rounded-full transition-all duration-300 ease-showroom ${
+                      isActive ? 'bg-stone-900 text-stone-50 scale-105' : ''
                     }`}>
                       <Icon className="w-5 h-5" />
                       {it.badge === 'cart' && count > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-ilkal-gold text-ilkal-deep text-[10px] font-bold w-4 h-4 grid place-items-center rounded-full shadow">
+                        <span className="absolute -top-1 -right-1 bg-wood text-stone-900 text-[10px] font-bold w-4 h-4 grid place-items-center rounded-full">
                           {count}
                         </span>
                       )}
