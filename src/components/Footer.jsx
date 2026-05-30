@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Youtube, Mail, Heart, MessageCircle, ArrowUpRight } from 'lucide-react';
 import logo from '../images/logo/ilkalKart_logo.png';
+import { usePolicies } from '../api/queries.js';
 
 const social = [
   { icon: MessageCircle, label: 'WhatsApp' },
@@ -10,6 +11,7 @@ const social = [
 ];
 
 export default function Footer() {
+  const { data: policies = [] } = usePolicies();
   return (
     <footer className="mt-24 bg-stone-900 text-stone-300">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-16 grid gap-12 md:grid-cols-4">
@@ -49,10 +51,14 @@ export default function Footer() {
         <div>
           <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-4">Policies</h4>
           <ul className="space-y-3 text-sm">
-            <li><button type="button" className="hover:text-stone-50 transition-colors text-left">Terms &amp; Conditions</button></li>
-            <li><button type="button" className="hover:text-stone-50 transition-colors text-left">Authenticity Promise</button></li>
-            <li><button type="button" className="hover:text-stone-50 transition-colors text-left">Shipping Policy</button></li>
-            <li><button type="button" className="hover:text-stone-50 transition-colors text-left">Privacy Policy</button></li>
+            {policies.map((p) => (
+              <li key={p.slug}>
+                <a href={`/policy/${p.slug}`} target="_blank" rel="noopener noreferrer"
+                  className="hover:text-stone-50 transition-colors">
+                  {p.label}
+                </a>
+              </li>
+            ))}
             <li><Link to="/track" className="hover:text-stone-50 transition-colors">Track Order</Link></li>
           </ul>
         </div>

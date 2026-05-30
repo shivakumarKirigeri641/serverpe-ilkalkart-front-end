@@ -14,6 +14,7 @@ import Feedback from './pages/Feedback.jsx';
 import Bulk from './pages/Bulk.jsx';
 import PurchaseHistory from './pages/PurchaseHistory.jsx';
 import Verify from './pages/Verify.jsx';
+import Policy from './pages/Policy.jsx';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/purchase-history" element={<PurchaseHistory />} />
           <Route path="/verify/:qrcode" element={<Verify />} />
+          <Route path="/policy/:slug" element={<Policy />} />
         </Routes>
       </main>
       <Footer />
