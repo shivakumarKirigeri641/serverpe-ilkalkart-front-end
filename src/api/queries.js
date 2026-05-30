@@ -62,6 +62,23 @@ export const useOffers = () =>
     staleTime: 5 * 60 * 1000,
   });
 
+export const usePolicies = () =>
+  useQuery({
+    queryKey: ["policies"],
+    queryFn: () => apiGet("/policies"),
+    select: (res) => (Array.isArray(res?.data) ? res.data : []),
+    staleTime: 60 * 60 * 1000,
+  });
+
+export const usePolicy = (slug) =>
+  useQuery({
+    queryKey: ["policy", slug],
+    queryFn: () => apiGet(`/policies/${slug}`),
+    select: (res) => res?.data || null,
+    enabled: Boolean(slug),
+    staleTime: 60 * 60 * 1000,
+  });
+
 export const useSareeMedia = (sareeCode, colorCode, enabled = true) =>
   useQuery({
     queryKey: ["saree-photos", sareeCode, colorCode],

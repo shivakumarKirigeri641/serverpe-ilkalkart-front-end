@@ -14,13 +14,14 @@ import Feedback from './pages/Feedback.jsx';
 import Bulk from './pages/Bulk.jsx';
 import PurchaseHistory from './pages/PurchaseHistory.jsx';
 import Verify from './pages/Verify.jsx';
+import Policy from './pages/Policy.jsx';
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-ilkal-cream">
+    <div className="min-h-screen flex flex-col bg-stone-50">
       <ScrollToTop />
       <Navbar />
-      <main className="flex-1 pt-16 pb-20 md:pb-0">
+      <main className="flex-1 pt-16 md:pt-20 pb-20 md:pb-0">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Browse />} />
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/purchase-history" element={<PurchaseHistory />} />
           <Route path="/verify/:qrcode" element={<Verify />} />
+          <Route path="/policy/:slug" element={<Policy />} />
         </Routes>
       </main>
       <Footer />

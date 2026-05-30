@@ -39,123 +39,115 @@ export default function WhatsAppOrderCard({ compact = false, variant = 'full' })
 
   if (variant === 'inline') {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 flex items-start gap-3">
-        <span className="w-9 h-9 rounded-full bg-green-600 text-white grid place-items-center shrink-0">
-          <WAIcon className="w-4 h-4" />
+      <a
+        href={waOrderHref()}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex items-center gap-4 rounded-4xl border border-stone-200 bg-white shadow-card px-5 sm:px-6 py-4 hover:shadow-card-hover transition-shadow"
+      >
+        <span className="grid place-items-center w-11 h-11 rounded-full bg-emerald-600 text-white shrink-0">
+          <WAIcon className="w-5 h-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] sm:text-sm text-green-900 leading-relaxed">
-            <b>Prefer ordering on WhatsApp?</b> Send me the <b>Saree ID</b> shown on each card, the
-            <b> quantity</b> and your <b>shipping address</b>. I&apos;ll share a secure payment link &mdash; the
-            rest, I take care of.
+          <p className="text-sm text-stone-700 leading-relaxed">
+            <b className="text-stone-900">Prefer WhatsApp?</b> Send the <b>Saree ID</b> on any card, the
+            quantity and your address — I&apos;ll share a secure payment link and take care of the rest.
           </p>
-          <a
-            href={waOrderHref()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 underline"
-          >
-            <WAIcon className="w-3.5 h-3.5" /> Chat: {FOUNDER_WHATSAPP_DISPLAY}
-          </a>
+          <span className="mt-0.5 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+            Chat · {FOUNDER_WHATSAPP_DISPLAY}
+          </span>
         </div>
-      </div>
+        <span className="text-stone-300 shrink-0 transition-transform duration-300 group-hover:translate-x-1">→</span>
+      </a>
     );
   }
 
+  const STEPS = [
+    { n: '1', t: 'Saree ID(s) + quantity', d: 'The dark ID pill on each saree card is the Saree ID. Share that ID and how many you want.' },
+    { n: '2', t: 'Shipping address',       d: 'Full name, complete address with landmark and PIN — same as you would on a courier.' },
+    { n: '3', t: 'A secure payment link',  d: "I'll personally share a secure payment link (same gateway as the website) — pay in one tap." },
+    { n: '4', t: 'Rest, I take care of',   d: 'Order confirmation, packing photos, packing video, tracking & doorstep delivery — all on WhatsApp.' },
+  ];
+
   return (
-    <section className={`px-4 sm:px-6 ${compact ? 'py-8' : 'py-12 sm:py-16'} bg-gradient-to-br from-green-50 via-white to-ilkal-cream`}>
-      <div className="max-w-4xl mx-auto">
+    <section className={`px-4 sm:px-6 ${compact ? 'py-10' : 'py-16 sm:py-20'} bg-stone-50`}>
+      <div className="max-w-7xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-3xl bg-white border-2 border-green-200 shadow-xl overflow-hidden"
+          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+          className="grid lg:grid-cols-[1fr_1.15fr] rounded-4xl overflow-hidden border border-stone-200 shadow-card-hover bg-white"
         >
-          <div className="bg-gradient-to-r from-green-600 via-emerald-500 to-green-600 text-white px-5 sm:px-6 py-4 flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur grid place-items-center shrink-0">
-              <WAIcon className="w-6 h-6" />
+          {/* LEFT — dark panel with a faux chat preview */}
+          <div className="relative bg-stone-900 text-stone-50 p-8 sm:p-10 flex flex-col">
+            <span className="eyebrow !text-stone-400 before:!bg-emerald-500">Order on WhatsApp</span>
+            <h2 className="mt-4 font-display font-extrabold tracking-display text-3xl sm:text-4xl text-stone-50 leading-[0.95]">
+              Not into website checkout? Just chat.
+            </h2>
+            <p className="mt-4 text-stone-400 leading-relaxed">
+              Message the founder directly — no app, no signup. Here&apos;s exactly what a message looks like:
+            </p>
+
+            {/* faux chat bubble */}
+            <div className="mt-7 space-y-2.5">
+              <div className="max-w-[19rem] rounded-2xl rounded-tl-md bg-white/5 ring-1 ring-white/10 px-4 py-3 text-sm text-stone-200 leading-relaxed">
+                Namaste 🙏 I&apos;d like to order:<br />
+                <span className="text-stone-400">• Saree ID 57 × 2</span><br />
+                <span className="text-stone-400">• Name + address with PIN</span>
+              </div>
+              <div className="ml-auto max-w-[17rem] rounded-2xl rounded-tr-md bg-emerald-600 px-4 py-3 text-sm text-white leading-relaxed">
+                Got it! Sharing your secure payment link now ✅
+              </div>
             </div>
-            <div className="min-w-0">
-              <h2 className="font-serif text-xl sm:text-2xl">Prefer to order on WhatsApp?</h2>
-              <p className="text-[11px] sm:text-xs opacity-95">
-                Talk to the founder directly — no app, no signup
-              </p>
+
+            {/* official number trust note */}
+            <div className="mt-auto pt-8">
+              <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 flex items-start gap-3">
+                <WAIcon className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <p className="text-[12px] text-stone-300 leading-relaxed">
+                  <b className="text-stone-50">Official WhatsApp:</b>{' '}
+                  <a href={waOrderHref()} target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-400 hover:underline">
+                    {FOUNDER_WHATSAPP_DISPLAY}
+                  </a>{' '}
+                  — the same number that sends your packing photos & tracking. <b className="text-stone-50">This is the only one.</b> Lookalike numbers asking for UPI transfers are not us.
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="p-5 sm:p-6 space-y-4">
-            <p className="text-sm sm:text-[15px] leading-relaxed text-ilkal-deep">
-              Not comfortable with website checkout? <b>Just message me on WhatsApp</b> with the
-              following — that&apos;s all I need to start preparing your saree:
-            </p>
-
-            <ol className="grid sm:grid-cols-2 gap-3">
-              {[
-                {
-                  n: '1',
-                  t: 'Saree ID(s) + quantity',
-                  d: 'The gold pill on each saree card is the Saree ID. Share that ID and how many you want.',
-                },
-                {
-                  n: '2',
-                  t: 'Shipping address',
-                  d: 'Full name, complete address with landmark and PIN — same as you would on a courier.',
-                },
-                {
-                  n: '3',
-                  t: 'I send a secure payment link',
-                  d: "I'll personally share a secure payment link (same gateway as the website) — pay in one tap.",
-                },
-                {
-                  n: '4',
-                  t: 'Rest, I take care of',
-                  d: 'Order confirmation, packing photos, packing video, tracking & doorstep delivery — all on WhatsApp.',
-                },
-              ].map((step, i) => (
+          {/* RIGHT — steps ledger + CTA */}
+          <div className="p-8 sm:p-10 flex flex-col">
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-stone-400">Four steps</span>
+            <ol className="mt-5 divide-y divide-stone-200 border-y border-stone-200">
+              {STEPS.map((step, i) => (
                 <motion.li
                   key={step.n}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: 16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.06 }}
-                  className="rounded-2xl border border-ilkal-gold/30 bg-ilkal-cream/40 p-3.5 relative"
+                  transition={{ delay: i * 0.07, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                  className="flex items-start gap-4 py-4"
                 >
-                  <div className="absolute -top-3 -left-3 w-9 h-9 rounded-full silk-gradient text-white font-bold grid place-items-center shadow-lg text-sm">
+                  <span className="grid place-items-center w-9 h-9 rounded-full bg-stone-900 text-stone-50 text-sm font-bold shrink-0">
                     {step.n}
+                  </span>
+                  <div>
+                    <h3 className="font-display font-bold tracking-display text-stone-900">{step.t}</h3>
+                    <p className="mt-0.5 text-sm text-stone-500 leading-relaxed">{step.d}</p>
                   </div>
-                  <h3 className="font-semibold text-ilkal-maroon text-sm mt-1">{step.t}</h3>
-                  <p className="text-[12px] sm:text-[13px] opacity-85 mt-1 leading-relaxed">{step.d}</p>
                 </motion.li>
               ))}
             </ol>
 
-            <div className="rounded-2xl bg-green-50 border border-green-200 p-4 flex items-start gap-3">
-              <WAIcon className="w-5 h-5 text-green-700 shrink-0 mt-0.5" />
-              <div className="text-[12px] sm:text-[13px] text-green-900 leading-relaxed">
-                <b>Founder&apos;s WhatsApp:</b>{' '}
-                <a
-                  href={waOrderHref()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold underline"
-                >
-                  {FOUNDER_WHATSAPP_DISPLAY}
-                </a>{' '}
-                · same number that sends your packing photos and tracking updates. <b>This is the only
-                official WhatsApp.</b> Lookalike numbers asking for UPI transfers are not us.
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2">
-              <a
-                href={waOrderHref()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-green-600 text-white font-semibold shadow hover:shadow-lg hover:bg-green-700 transition flex-1"
-              >
-                <WAIcon className="w-5 h-5" /> Start a WhatsApp order
-              </a>
-            </div>
+            <a
+              href={waOrderHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full bg-emerald-600 text-white font-medium shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition active:scale-[0.98]"
+            >
+              <WAIcon className="w-5 h-5" /> Start a WhatsApp order
+            </a>
           </div>
         </motion.div>
       </div>

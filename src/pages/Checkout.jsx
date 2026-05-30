@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Minus, Trash2, Lock, ShieldCheck, ChevronRight, MapPin, Tag, Sparkles, MessageSquare, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Plus, Minus, Trash2, Lock, ShieldCheck, ChevronRight, MapPin, Tag, Sparkles, MessageSquare, CheckCircle2, AlertTriangle, ShoppingBag, Camera } from 'lucide-react';
 
 import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext.jsx';
@@ -385,55 +385,93 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <div className="max-w-md mx-auto text-center py-24 px-6">
-        <div className="text-7xl">🛍️</div>
-        <h2 className="font-serif text-2xl text-ilkal-maroon mt-3">Your bag is empty</h2>
-        <p className="opacity-70 mt-2">Discover sarees woven with love.</p>
-        <Link to="/browse" className="btn-primary mt-6 inline-flex">Start Browsing Sarees <ChevronRight className="w-4 h-4" /></Link>
+        <span className="w-20 h-20 mx-auto rounded-full bg-stone-100 grid place-items-center">
+          <ShoppingBag className="w-9 h-9 text-stone-400" />
+        </span>
+        <h2 className="mt-6 font-display font-extrabold tracking-display text-3xl text-stone-900">Your bag is empty.</h2>
+        <p className="mt-2 text-stone-500">Discover sarees woven with love.</p>
+        <Link to="/browse" className="btn-primary mt-7 inline-flex">Start browsing sarees <ChevronRight className="w-4 h-4" /></Link>
       </div>
     );
   }
 
+  const bulkPct = Math.min(100, Math.round((count / bulkMinQty) * 100));
+  const bulkLeft = Math.max(0, bulkMinQty - count);
+  const bulkRate = (bulkDiscountRate * 100).toFixed(0);
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid gap-6 lg:grid-cols-3">
-      <div className="lg:col-span-2 space-y-6">
-        <div className="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-sm text-green-900">
-          <div className="flex items-start gap-2">
-            <ShieldCheck className="w-4 h-4 text-green-700 mt-0.5 shrink-0" />
-            <span>
-              <b>No login. No signup. No account.</b> Just fill in your delivery details below and pay —
-              your saree will be hand-packed and shipped straight to your doorstep.
-            </span>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      {/* ============================================================
+          CHECKOUT HEADER — dark panel: title, order snapshot, step rail
+         ============================================================ */}
+      <div className="rounded-4xl bg-stone-900 text-stone-50 p-7 sm:p-9 shadow-card-hover overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
+          <div>
+            <span className="eyebrow !text-stone-400 before:!bg-wood">Almost yours</span>
+            <h1 className="mt-3 font-display font-extrabold tracking-display text-5xl sm:text-6xl text-stone-50 leading-[0.9]">Checkout.</h1>
+            <p className="mt-3 inline-flex items-center gap-2 text-sm text-stone-400">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span><b className="text-stone-50">No login, no signup.</b> Fill, pay, and it ships to your door.</span>
+            </p>
           </div>
-          <ol className="mt-2 flex items-center gap-1 sm:gap-2 flex-wrap text-[11px] font-medium text-green-900/90 pl-6">
-            {['Shortlist', 'Add to cart', 'Fill details', 'Pay', 'Done', 'Doorstep'].map((s, i, a) => (
-              <li key={s} className="flex items-center gap-1 sm:gap-2">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-green-200">
-                  <span className="w-3.5 h-3.5 rounded-full bg-green-700 text-white text-[9px] font-bold grid place-items-center">{i + 1}</span>
-                  {s}
-                </span>
-                {i < a.length - 1 && <span className="text-green-700/60">→</span>}
-              </li>
-            ))}
-          </ol>
+          <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 px-5 py-4 text-center shrink-0">
+            <div className="font-display font-extrabold tracking-display text-4xl leading-none text-wood">{count}</div>
+            <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400">in your bag</div>
+          </div>
         </div>
 
+        {/* step rail on a track */}
+        <ol className="mt-8 relative grid grid-cols-6 gap-1">
+          <span className="absolute top-3 left-[8.33%] right-[8.33%] h-0.5 bg-stone-700" aria-hidden />
+          {['Shortlist', 'Add to cart', 'Fill details', 'Pay', 'Done', 'Doorstep'].map((s, i) => {
+            const done = i < 2;
+            const here = i === 2;
+            return (
+              <li key={s} className="relative flex flex-col items-center text-center">
+                <span className={`grid place-items-center w-6 h-6 rounded-full ring-4 ring-stone-900 text-[10px] font-bold transition-colors ${
+                  here ? 'bg-wood text-stone-900' : done ? 'bg-stone-50 text-stone-900' : 'bg-stone-700 text-stone-400'
+                }`}>
+                  {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : i + 1}
+                </span>
+                <span className={`mt-2.5 text-[10px] sm:text-xs font-medium leading-tight ${here ? 'text-stone-50' : 'text-stone-500'}`}>{s}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="lg:col-span-2 space-y-6">
+        {/* bulk discount progress meter */}
         {bulkEligible ? (
-          <div className="bg-ilkal-maroon/5 border border-ilkal-maroon/20 rounded-2xl px-4 py-3 text-sm text-ilkal-maroon flex items-start gap-2">
-            <Sparkles className="w-4 h-4 text-ilkal-gold mt-0.5 shrink-0" />
-            <span>
-              <b>Bulk-order discount unlocked!</b> {count} sarees in your bag — a flat{' '}
-              {(bulkDiscountRate * 100).toFixed(0)}% off (₹{bulkDiscount.toLocaleString('en-IN')}) has been applied below.
+          <div className="rounded-4xl bg-stone-900 text-stone-50 px-6 py-5 flex items-center gap-4">
+            <span className="grid place-items-center w-11 h-11 rounded-2xl bg-wood text-stone-900 shrink-0">
+              <Sparkles className="w-5 h-5" />
             </span>
+            <div>
+              <div className="font-display font-bold tracking-display text-lg">Bulk discount unlocked!</div>
+              <p className="text-sm text-stone-400">Flat {bulkRate}% off — ₹{bulkDiscount.toLocaleString('en-IN')} saved, applied below.</p>
+            </div>
           </div>
         ) : (
-          <div className="bg-ilkal-cream border border-ilkal-gold/30 rounded-2xl px-4 py-3 text-sm text-ilkal-deep flex items-start gap-2">
-            <Tag className="w-4 h-4 text-ilkal-maroon mt-0.5 shrink-0" />
-            <span>
-              Order <b>{bulkMinQty}+ sarees</b> in one go and unlock a flat{' '}
-              <b>{(bulkDiscountRate * 100).toFixed(0)}% bulk discount</b> on your total —{' '}
-              <Link to="/bulk" className="text-ilkal-maroon font-semibold underline">see how it works</Link>.
-              (Currently {count} in bag.)
-            </span>
+          <div className="rounded-4xl bg-white border border-stone-200 shadow-card px-6 py-5">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2.5">
+                <Tag className="w-5 h-5 text-wood-dark" />
+                <span className="text-sm text-stone-600">
+                  <b className="text-stone-900">{bulkLeft} more</b> to unlock a flat <b className="text-stone-900">{bulkRate}% off</b>
+                </span>
+              </div>
+              <Link to="/bulk" className="text-xs text-wood-dark font-semibold underline underline-offset-2 shrink-0">How it works</Link>
+            </div>
+            <div className="mt-3 h-2.5 w-full rounded-full bg-stone-100 overflow-hidden">
+              <div className="h-full rounded-full bg-stone-900 transition-all duration-500" style={{ width: `${bulkPct}%` }} />
+            </div>
+            <div className="mt-2 flex justify-between">
+              {Array.from({ length: bulkMinQty }).map((_, i) => (
+                <span key={i} className={`w-1.5 h-1.5 rounded-full ${i < count ? 'bg-stone-900' : 'bg-stone-200'}`} />
+              ))}
+            </div>
           </div>
         )}
 
@@ -443,59 +481,71 @@ export default function Checkout() {
           action={
             <button
               onClick={clearBag}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-ilkal-maroon/30 text-ilkal-maroon text-xs font-semibold hover:bg-ilkal-maroon/5 transition">
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border-2 border-stone-200 text-stone-600 text-xs font-medium hover:border-stone-900 hover:text-stone-900 transition">
               <Trash2 className="w-3.5 h-3.5" /> Clear bag
             </button>
           }
         >
-          <div className="space-y-3">
-            {items.map(it => (
-              <div key={it.id} className="flex gap-3 bg-white rounded-2xl p-3 shadow-sm border border-ilkal-gold/20">
-                <img
-                  src={it.images?.[0] || it.gallery?.[0]?.src || PLACEHOLDER_IMG}
-                  alt={it.name}
-                  className="w-20 h-24 rounded-xl object-cover" />
-                <div className="flex-1">
-                  <div className="flex justify-between">
-                    <div className="min-w-0 pr-2">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <h3 className="font-semibold text-ilkal-maroon truncate">{it.name}</h3>
-                        <span className="shrink-0 text-[10px] font-bold text-ilkal-maroon bg-ilkal-gold/20 border border-ilkal-gold/40 px-1.5 py-0.5 rounded-full">
-                          ID:{it.id}
-                        </span>
-                      </div>
-                      <dl className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] leading-tight">
-                        {it.color && (<><dt className="opacity-60">Color</dt><dd className="text-ilkal-deep font-medium truncate">{it.color}</dd></>)}
-                        {it.material && (<><dt className="opacity-60">Material</dt><dd className="text-ilkal-deep font-medium truncate">{it.material}</dd></>)}
-                        {it.border && (<><dt className="opacity-60">Border</dt><dd className="text-ilkal-deep font-medium truncate">{it.border}</dd></>)}
-                        {it.pallu && (<><dt className="opacity-60">Pallu</dt><dd className="text-ilkal-deep font-medium truncate">{it.pallu}</dd></>)}
-                        {it.blouse && (<><dt className="opacity-60">Blouse</dt><dd className="text-ilkal-deep font-medium truncate">{it.blouse}</dd></>)}
-                      </dl>
+          <div className="space-y-4">
+            {items.map(it => {
+              const specs = [
+                ['Colour', it.color], ['Material', it.material], ['Border', it.border],
+                ['Pallu', it.pallu], ['Blouse', it.blouse],
+              ].filter(([, v]) => v);
+              return (
+              <div key={it.id} className="flex flex-col sm:flex-row gap-4 rounded-4xl p-3.5 border border-stone-200 bg-stone-50">
+                {/* image bay */}
+                <div className="relative w-full sm:w-28 shrink-0">
+                  <img
+                    src={it.images?.[0] || it.gallery?.[0]?.src || PLACEHOLDER_IMG}
+                    alt={it.name}
+                    className="w-full h-44 sm:h-full sm:aspect-[3/4] rounded-2xl object-cover bg-stone-100" />
+                  <span className="absolute top-2 left-2 text-[10px] font-bold text-stone-50 bg-stone-900/85 backdrop-blur px-2 py-0.5 rounded-full tabular-nums">
+                    ID {it.id}
+                  </span>
+                </div>
+
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h3 className="font-display font-bold tracking-display text-lg text-stone-900 leading-tight">{it.name}</h3>
                       {it.isHandloom && (
-                        <span className="mt-1 inline-block chip text-[10px]">Handloom</span>
+                        <span className="mt-1 inline-block text-[10px] font-bold uppercase tracking-wide text-wood-dark bg-wood/10 px-2 py-0.5 rounded-full">Pure handloom</span>
                       )}
                     </div>
-                    <button onClick={() => remove(it.id)} className="text-ilkal-maroon/70 hover:text-ilkal-maroon">
+                    <button onClick={() => remove(it.id)} aria-label="Remove" className="grid place-items-center w-8 h-8 rounded-full text-stone-400 hover:bg-stone-200 hover:text-stone-900 transition shrink-0">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2 bg-ilkal-cream rounded-full border border-ilkal-gold/40 p-0.5">
-                      <button onClick={() => dec(it.id)} className="w-8 h-8 rounded-full bg-white shadow grid place-items-center text-ilkal-maroon"><Minus className="w-3.5 h-3.5" /></button>
-                      <span className="font-bold text-ilkal-maroon w-6 text-center">{it.qty}</span>
-                      <button onClick={() => inc(it.id)} disabled={it.qty >= 5} className="w-8 h-8 rounded-full bg-white shadow grid place-items-center text-ilkal-maroon disabled:opacity-40"><Plus className="w-3.5 h-3.5" /></button>
+
+                  {/* spec chips */}
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {specs.map(([k, v]) => (
+                      <span key={k} className="inline-flex items-baseline gap-1 px-2.5 py-1 rounded-full bg-white border border-stone-200 text-[11px]">
+                        <span className="text-stone-400">{k}</span>
+                        <span className="font-medium text-stone-700">{v}</span>
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-auto pt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-1 rounded-full border-2 border-stone-900 p-0.5">
+                      <button onClick={() => dec(it.id)} className="w-7 h-7 rounded-full bg-stone-900 text-stone-50 grid place-items-center active:scale-90 transition"><Minus className="w-3.5 h-3.5" /></button>
+                      <span className="font-bold text-stone-900 w-6 text-center text-sm tabular-nums">{it.qty}</span>
+                      <button onClick={() => inc(it.id)} disabled={it.qty >= 5} className="w-7 h-7 rounded-full bg-stone-900 text-stone-50 grid place-items-center active:scale-90 disabled:opacity-30 transition"><Plus className="w-3.5 h-3.5" /></button>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-ilkal-maroon">₹{(it.qty * it.price).toLocaleString('en-IN')}</div>
-                      <div className="text-xs opacity-60">₹{it.price.toLocaleString('en-IN')} × {it.qty}</div>
+                      <div className="font-display font-bold text-lg text-stone-900 tabular-nums">₹{(it.qty * it.price).toLocaleString('en-IN')}</div>
+                      <div className="text-[11px] text-stone-400 tabular-nums">₹{it.price.toLocaleString('en-IN')} × {it.qty}</div>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+            );})}
           </div>
-          <p className="mt-3 text-[11px] italic text-ilkal-deep/80">
-            📷 Disclaimer: A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
+          <p className="mt-3 text-[11px] text-stone-400 flex items-start gap-1.5">
+            <Camera className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            A slight variation in the colour of the saree is possible due to natural lighting while taking the photo.
           </p>
         </Section>
 
@@ -526,9 +576,9 @@ export default function Checkout() {
 
         {/* Address */}
         <Section title="Shipping Address">
-          <div className="mb-3 flex items-center gap-2 text-xs text-ilkal-maroon bg-ilkal-cream rounded-xl px-3 py-2 border border-ilkal-gold/30">
-            <MapPin className="w-4 h-4 shrink-0" />
-            <span>Pin your location on the map — area, city, district, state & PIN will be filled automatically.</span>
+          <div className="mb-3 flex items-center gap-2 text-xs text-stone-600 bg-stone-100 rounded-2xl px-3.5 py-2.5">
+            <MapPin className="w-4 h-4 shrink-0 text-wood-dark" />
+            <span>Pin your location on the map — area, city, district, state &amp; PIN fill automatically.</span>
           </div>
           <AddressPicker value={addr} stateOptions={stateOptions} onChange={v => setAddr(a => ({ ...a, ...v }))} />
 
@@ -560,12 +610,11 @@ export default function Checkout() {
               invalid={showErr('pin')} errorText="Enter a valid 6-digit PIN code" />
           </div>
 
-          <div className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-[12px] text-amber-900 flex items-start gap-2 leading-snug">
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] text-amber-900 flex items-start gap-2.5 leading-snug">
             <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
             <span>
-              <b>Please re-check your address.</b> If you pinned your location on the map above, confirm the
-              house number, street, city, state and PIN are correct — even small mistakes can delay or
-              misroute your delivery. We ship exactly to the address shown here.
+              <b>Please re-check your address.</b> Confirm the house number, street, city, state and PIN are
+              correct — even small mistakes can delay or misroute delivery. We ship exactly to the address shown.
             </span>
           </div>
         </Section>
@@ -608,27 +657,28 @@ export default function Checkout() {
             <p className="text-[10px] opacity-60 leading-snug -mt-0.5 mb-1">{gstDescription}</p>
           )}
           <Row label="Shipping" value={shipping ? `₹${shipping}` : 'FREE'} highlight={!shipping} />
-          <div className="my-2 border-t border-dashed border-ilkal-gold/40" />
-          <Row label="Total Payable" value={`₹${total.toLocaleString('en-IN')}`} bold />
-          <p className="mt-2 text-xs opacity-70">All prices are inclusive of GST. You won’t be charged anything extra.</p>
+          <div className="my-3 border-t border-dashed border-stone-200" />
+          <Row label="Total payable" value={`₹${total.toLocaleString('en-IN')}`} bold />
+          <p className="mt-2 text-xs text-stone-400">All prices are inclusive of GST. You won’t be charged anything extra.</p>
 
-          <p className="mt-3 text-[11px] text-red-800 leading-snug">
-            🛡️ Pay only via the secure button below. We never ask for UPI to personal numbers or extra fees.
+          <p className="mt-3 text-[11px] text-stone-500 leading-snug flex items-start gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-wood-dark mt-0.5 shrink-0" />
+            Pay only via the secure button below. We never ask for UPI to personal numbers or extra fees.
           </p>
 
           <div className="mt-5">
             {!otpVerified ? (
-              <div className="rounded-2xl border border-ilkal-gold/30 bg-ilkal-cream/60 p-4 space-y-3">
+              <div className="rounded-4xl border border-stone-200 bg-stone-100 p-5 space-y-3">
                 <div>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-ilkal-maroon">
-                    <MessageSquare className="w-4 h-4 shrink-0" />
+                  <div className="flex items-center gap-2 text-sm font-display font-bold tracking-display text-stone-900">
+                    <MessageSquare className="w-4 h-4 shrink-0 text-wood-dark" />
                     <span>Verify mobile to continue</span>
                   </div>
-                  <p className="mt-1 text-[11px] opacity-70 leading-snug">
-                    We&apos;ll send a 4-digit OTP to <b>{contact.mobile || '— —'}</b> to confirm your order.
+                  <p className="mt-1.5 text-[11px] text-stone-500 leading-snug">
+                    We&apos;ll send a 4-digit OTP to <b className="text-stone-700">{contact.mobile || '— —'}</b> to confirm your order.
                   </p>
-                  <p className="mt-1 text-[11px] text-green-900 leading-snug">
-                    🔒 SMS only from <span className="font-mono">*-SRVRPE-*</span>.
+                  <p className="mt-1 text-[11px] text-stone-500 leading-snug">
+                    🔒 SMS only from <span className="font-mono text-stone-700">*-SRVRPE-*</span>.
                   </p>
                 </div>
 
@@ -648,7 +698,7 @@ export default function Checkout() {
                     )}
                   </button>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex items-stretch gap-2">
                       <input
                         type="text"
@@ -662,63 +712,63 @@ export default function Checkout() {
                             verifyOtp();
                           }
                         }}
-                        placeholder="• • • •"
-                        className="flex-1 min-w-0 h-11 px-3 rounded-xl bg-white border border-ilkal-gold/40 focus:border-ilkal-maroon focus:outline-none text-center tracking-[0.5em] font-bold text-ilkal-maroon"
+                        placeholder="••••"
+                        className="flex-1 min-w-0 h-12 px-3 rounded-full bg-white border-2 border-stone-200 focus:border-stone-900 focus:outline-none text-center tracking-[0.5em] font-bold text-lg text-stone-900"
                       />
                       <button
                         type="button"
                         onClick={verifyOtp}
                         disabled={otp.length !== 4 || verifyingOtp}
-                        className="h-11 px-5 rounded-xl silk-gradient text-white font-semibold text-sm shadow shrink-0 disabled:opacity-60 disabled:cursor-not-allowed">
+                        className="h-12 px-6 rounded-full bg-stone-900 text-stone-50 font-medium text-sm shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95">
                         {verifyingOtp ? '…' : 'Verify'}
                       </button>
                     </div>
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="opacity-60">Didn&apos;t get the code?</span>
+                      <span className="text-stone-400">Didn&apos;t get the code?</span>
                       <button
                         type="button"
                         onClick={sendOtp}
                         disabled={sendingOtp}
-                        className="text-ilkal-maroon font-semibold underline disabled:opacity-50">
+                        className="text-wood-dark font-medium underline underline-offset-2 disabled:opacity-50">
                         Resend OTP
                       </button>
                     </div>
-                    <p className="text-[11px] text-red-800 leading-snug">
-                      🚨 OTP only from <span className="font-mono">*-SRVRPE-*</span>. Never share on a call.
+                    <p className="text-[11px] text-stone-500 leading-snug">
+                      🚨 OTP only from <span className="font-mono text-stone-700">*-SRVRPE-*</span>. Never share on a call.
                     </p>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="rounded-2xl border border-green-200 bg-green-50 px-3 py-2.5 text-sm text-green-800 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-700 shrink-0" />
+              <div className="rounded-2xl bg-emerald-50 ring-1 ring-emerald-100 px-4 py-3 text-sm text-emerald-800 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Mobile <b>{contact.mobile}</b> verified</span>
               </div>
             )}
           </div>
 
           {/* Terms & Conditions consent — required before payment */}
-          <div className={`mt-3 rounded-2xl border p-3 sm:p-3.5 transition ${
+          <div className={`mt-3 rounded-2xl border-2 p-3.5 transition ${
             showTermsError && !agreedTerms
-              ? 'border-red-300 bg-red-50'
+              ? 'border-rose-300 bg-rose-50'
               : agreedTerms
-                ? 'border-green-200 bg-green-50'
-                : 'border-ilkal-gold/30 bg-ilkal-cream/60'
+                ? 'border-emerald-200 bg-emerald-50'
+                : 'border-stone-200 bg-stone-50'
           }`}>
             <label className="flex items-start gap-2.5 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={agreedTerms}
                 onChange={(e) => { setAgreedTerms(e.target.checked); if (e.target.checked) setShowTermsError(false); }}
-                className="mt-0.5 w-4 h-4 shrink-0 accent-ilkal-maroon cursor-pointer"
+                className="mt-0.5 w-4 h-4 shrink-0 accent-stone-900 cursor-pointer"
               />
-              <span className="text-[11px] leading-snug text-ilkal-deep">
-                I agree to the <b className="text-ilkal-maroon">Terms</b>, the{' '}
-                <b className="text-ilkal-maroon">no-return policy</b> and accept all liabilities thereof.
+              <span className="text-[11px] leading-snug text-stone-600">
+                I agree to the <b className="text-stone-900">Terms</b>, the{' '}
+                <b className="text-stone-900">no-return policy</b> and accept all liabilities thereof.
               </span>
             </label>
             {showTermsError && !agreedTerms && (
-              <p className="mt-2 text-[11px] font-semibold text-red-700 pl-6.5">
+              <p className="mt-2 text-[11px] font-semibold text-rose-700 pl-6.5">
                 Please tick the box to agree before paying.
               </p>
             )}
@@ -740,11 +790,12 @@ export default function Checkout() {
               <><Lock className="w-4 h-4" /> Pay ₹{total.toLocaleString('en-IN')}</>
             )}
           </button>
-          <div className="mt-3 flex items-center justify-center gap-1 text-xs opacity-70">
-            <ShieldCheck className="w-4 h-4 text-green-700" /> Demo payment — no real charge
+          <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-stone-400">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" /> Demo payment — no real charge
           </div>
         </Section>
       </aside>
+      </div>
 
       {addrDialogOpen && (
         <AddressChoiceDialog
@@ -764,43 +815,44 @@ export default function Checkout() {
 function AddressChoiceDialog({ user, addresses, stateOptions, value, onChange, onApply, onClose }) {
   const stateName = (id) => stateOptions.find(o => String(o.id) === String(id))?.name || '';
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl border border-ilkal-gold/30 flex flex-col" onClick={e => e.stopPropagation()}>
-        <div className="px-5 py-4 border-b border-ilkal-gold/20">
-          <h3 className="font-serif text-lg text-ilkal-maroon">Welcome back{user?.user_name ? `, ${user.user_name}` : ''}</h3>
-          <p className="text-xs opacity-70 mt-1">Choose a saved address or enter a new one.</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 backdrop-blur-sm p-4" onClick={onClose}>
+      <div className="bg-white rounded-4xl max-w-lg w-full max-h-[85vh] overflow-hidden shadow-card-hover border border-stone-200 flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="px-6 py-5 border-b border-stone-200">
+          <span className="eyebrow">Welcome back</span>
+          <h3 className="mt-2 font-display font-extrabold tracking-display text-xl text-stone-900">{user?.user_name ? user.user_name : 'Your saved addresses'}</h3>
+          <p className="text-xs text-stone-400 mt-1">Choose a saved address or enter a new one.</p>
         </div>
-        <div className="px-5 py-3 overflow-y-auto space-y-2">
-          {addresses.map(a => (
-            <label key={a.id} className={`flex items-start gap-3 p-3 rounded-2xl border cursor-pointer ${String(value) === String(a.id) ? 'border-ilkal-maroon bg-ilkal-cream/60' : 'border-ilkal-gold/30 hover:bg-ilkal-cream/30'}`}>
-              <input type="radio" name="addr-choice" className="mt-1" value={a.id}
-                checked={String(value) === String(a.id)}
-                onChange={() => onChange(String(a.id))} />
+        <div className="px-6 py-4 overflow-y-auto space-y-2.5">
+          {addresses.map(a => {
+            const on = String(value) === String(a.id);
+            return (
+            <label key={a.id} className={`flex items-start gap-3 p-4 rounded-4xl border-2 cursor-pointer transition-colors ${on ? 'border-stone-900 bg-stone-50' : 'border-stone-200 hover:border-stone-300'}`}>
+              <span className={`mt-0.5 grid place-items-center w-5 h-5 rounded-full border-2 shrink-0 ${on ? 'border-stone-900 bg-stone-900' : 'border-stone-300'}`}>
+                {on && <span className="w-2 h-2 rounded-full bg-stone-50" />}
+              </span>
+              <input type="radio" name="addr-choice" className="sr-only" value={a.id} checked={on} onChange={() => onChange(String(a.id))} />
               <div className="text-sm leading-snug">
-                <div className="font-medium text-ilkal-maroon">
+                <div className="font-display font-bold tracking-display text-stone-900">
                   {[a.house_flat_no, a.address_line1].filter(Boolean).join(', ')}
                 </div>
-                <div className="opacity-80">
-                  {[a.address_line2, a.area, a.landmark].filter(Boolean).join(', ')}
-                </div>
-                <div className="opacity-80">
-                  {[a.city, a.district, stateName(a.state_union_id), a.pincode].filter(Boolean).join(', ')}
-                </div>
+                <div className="text-stone-500">{[a.address_line2, a.area, a.landmark].filter(Boolean).join(', ')}</div>
+                <div className="text-stone-500">{[a.city, a.district, stateName(a.state_union_id), a.pincode].filter(Boolean).join(', ')}</div>
               </div>
             </label>
-          ))}
-          <label className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer ${value === 'new' ? 'border-ilkal-maroon bg-ilkal-cream/60' : 'border-ilkal-gold/30 hover:bg-ilkal-cream/30'}`}>
-            <input type="radio" name="addr-choice" value="new"
-              checked={value === 'new'}
-              onChange={() => onChange('new')} />
-            <span className="text-sm font-medium text-ilkal-maroon">Enter a new address</span>
+          );})}
+          <label className={`flex items-center gap-3 p-4 rounded-4xl border-2 cursor-pointer transition-colors ${value === 'new' ? 'border-stone-900 bg-stone-50' : 'border-stone-200 hover:border-stone-300'}`}>
+            <span className={`grid place-items-center w-5 h-5 rounded-full border-2 shrink-0 ${value === 'new' ? 'border-stone-900 bg-stone-900' : 'border-stone-300'}`}>
+              {value === 'new' && <span className="w-2 h-2 rounded-full bg-stone-50" />}
+            </span>
+            <input type="radio" name="addr-choice" value="new" className="sr-only" checked={value === 'new'} onChange={() => onChange('new')} />
+            <span className="text-sm font-display font-bold tracking-display text-stone-900">Enter a new address</span>
           </label>
         </div>
-        <div className="px-5 py-3 border-t border-ilkal-gold/20 flex justify-end gap-2">
+        <div className="px-6 py-4 border-t border-stone-200 flex justify-end gap-2.5">
           <button type="button" onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-ilkal-gold/40 text-sm">Cancel</button>
+            className="px-5 py-2.5 rounded-full border-2 border-stone-200 text-stone-600 text-sm font-medium hover:border-stone-900 hover:text-stone-900 transition">Cancel</button>
           <button type="button" onClick={onApply}
-            className="btn-primary px-4 py-2 text-sm">Continue</button>
+            className="btn-primary !py-2.5 !px-5 text-sm">Continue</button>
         </div>
       </div>
     </div>
@@ -809,9 +861,9 @@ function AddressChoiceDialog({ user, addresses, stateOptions, value, onChange, o
 
 function Section({ title, children, action }) {
   return (
-    <section className="bg-white rounded-3xl p-5 shadow-md border border-ilkal-gold/20">
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <h2 className="font-serif text-xl text-ilkal-maroon">{title}</h2>
+    <section className="bg-white rounded-4xl p-6 sm:p-7 shadow-card border border-stone-200">
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <h2 className="font-display font-extrabold tracking-display text-xl text-stone-900">{title}</h2>
         {action}
       </div>
       {children}
@@ -820,28 +872,28 @@ function Section({ title, children, action }) {
 }
 function Input({ label, value, onChange, type = 'text', className = '', invalid = false, errorText, ...rest }) {
   const borderCls = invalid
-    ? 'border-red-500 focus:border-red-500 ring-1 ring-red-300'
-    : 'border-ilkal-gold/30 focus:border-ilkal-maroon';
+    ? 'border-rose-400 focus:border-rose-500'
+    : 'border-stone-200 focus:border-stone-900';
   return (
     <label className={`block ${className}`}>
-      <span className={`text-xs font-medium ${invalid ? 'text-red-600' : 'opacity-80'}`}>{label}</span>
+      <span className={`text-[11px] font-bold uppercase tracking-[0.12em] ${invalid ? 'text-rose-600' : 'text-stone-400'}`}>{label}</span>
       <input type={type} value={value} onChange={e => onChange(e.target.value)} {...rest}
-        className={`mt-1 w-full px-3 py-2.5 rounded-xl bg-ilkal-cream border focus:outline-none ${borderCls}`} />
+        className={`mt-1.5 w-full px-4 py-3 rounded-full bg-stone-50 border-2 text-stone-900 placeholder:text-stone-400 focus:outline-none transition-colors ${borderCls}`} />
       {invalid && errorText && (
-        <span className="mt-1 block text-[11px] text-red-600">{errorText}</span>
+        <span className="mt-1.5 block text-[11px] text-rose-600">{errorText}</span>
       )}
     </label>
   );
 }
 function Select({ label, value, onChange, options, className = '', invalid = false, errorText }) {
   const borderCls = invalid
-    ? 'border-red-500 focus:border-red-500 ring-1 ring-red-300'
-    : 'border-ilkal-gold/30 focus:border-ilkal-maroon';
+    ? 'border-rose-400 focus:border-rose-500'
+    : 'border-stone-200 focus:border-stone-900';
   return (
     <label className={`block ${className}`}>
-      <span className={`text-xs font-medium ${invalid ? 'text-red-600' : 'opacity-80'}`}>{label}</span>
+      <span className={`text-[11px] font-bold uppercase tracking-[0.12em] ${invalid ? 'text-rose-600' : 'text-stone-400'}`}>{label}</span>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className={`mt-1 w-full px-3 py-2.5 rounded-xl bg-ilkal-cream border focus:outline-none ${borderCls}`}>
+        className={`mt-1.5 w-full px-4 py-3 rounded-full bg-stone-50 border-2 text-stone-900 focus:outline-none transition-colors ${borderCls}`}>
         <option value="">Select state / UT…</option>
         {options.map(o => {
           const val = typeof o === 'string' ? o : o.id;
@@ -850,16 +902,16 @@ function Select({ label, value, onChange, options, className = '', invalid = fal
         })}
       </select>
       {invalid && errorText && (
-        <span className="mt-1 block text-[11px] text-red-600">{errorText}</span>
+        <span className="mt-1.5 block text-[11px] text-rose-600">{errorText}</span>
       )}
     </label>
   );
 }
 function Row({ label, value, bold, highlight }) {
   return (
-    <div className={`flex justify-between text-sm py-1 ${bold ? 'text-base font-bold text-ilkal-maroon' : ''}`}>
-      <span className="opacity-80">{label}</span>
-      <span className={highlight ? 'text-green-700 font-semibold' : ''}>{value}</span>
+    <div className={`flex justify-between py-1.5 ${bold ? 'font-display font-extrabold tracking-display text-xl text-stone-900' : 'text-sm'}`}>
+      <span className={bold ? '' : 'text-stone-500'}>{label}</span>
+      <span className={highlight ? 'text-emerald-600 font-semibold' : (bold ? '' : 'text-stone-900 font-medium tabular-nums')}>{value}</span>
     </div>
   );
 }
